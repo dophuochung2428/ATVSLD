@@ -16,20 +16,24 @@ export class AuthService {
 
   async validateUser(username: string, password: string, departmentId: number): Promise<User | null> {
     const user = await this.userService.findByAccountWithDepartment(username);
-    if (user &&
-      user.department?.id === departmentId &&
-      await bcrypt.compare(password, user.password)
-    ) { 
-      return user;
+    if (!user) {
+      throw new UnauthorizedException('Tài khoản không tồn tại');
     }
-    return null;
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Mật khẩu không chính xác');
+    }
+
+    if (user.department?.id !== departmentId) {
+      throw new UnauthorizedException('Đơn vị không khớp');
+    }
+
+    return user;
   }
 
   async login(loginDto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.validateUser(loginDto.username, loginDto.password, loginDto.departmentId);
-    if (!user) {
-      throw new UnauthorizedException('Invalid username or password');
-    }
     const payload = { username: user.account, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
