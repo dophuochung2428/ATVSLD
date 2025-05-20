@@ -6,8 +6,13 @@ import { UserController } from '../../controllers/user.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
-  providers: [UserService],
   controllers: [UserController],
-  exports: [UserService],
+  providers: [
+    {
+      provide: 'IUserService',
+      useClass: UserService,
+    },
+  ],
+  exports: ['IUserService'],
 })
 export class UserModule {}

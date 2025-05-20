@@ -21,7 +21,7 @@ import { AuthModule } from './modules/auth/auth.module';
         database: configService.get('DB_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
-        ssl: true,
+        ssl: true, //xóa khi chạy local
         extra: {
           ssl: {
             rejectUnauthorized: false,

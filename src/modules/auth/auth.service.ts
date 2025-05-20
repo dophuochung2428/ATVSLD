@@ -1,21 +1,25 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../../services/user/user.service'; 
 import { MailService } from '../mail/mail.service';
 import { User } from '../../entities/user.entity';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-
+import { ResetPasswordPayload } from './interfaces/reset-password-payload.interface';
+import { NotFoundException } from '@nestjs/common';
+import { IAuthService } from './interfaces/auth-service.interface';
+import { IUserService } from 'src/services/user/user.service.interface';
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService{
   constructor(
-    private readonly userService: UserService,
+    @Inject('IUserService')
+    private readonly userService: IUserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
   ) {}
 
-  async validateUser(username: string, password: string, departmentId: number): Promise<User | null> {
-    const user = await this.userService.findByAccountWithDepartment(username);
+  async validateUser(username: string, password: string): Promise<User | null> {
+    const user = await this.userService.findByAccount(username);
     if (!user) {
       throw new UnauthorizedException('Tài khoản không tồn tại');
     }
@@ -25,16 +29,12 @@ export class AuthService {
       throw new UnauthorizedException('Mật khẩu không chính xác');
     }
 
-    if (user.department?.id !== departmentId) {
-      throw new UnauthorizedException('Đơn vị không khớp');
-    }
-
     return user;
   }
 
   async login(loginDto: LoginDto): Promise<{ access_token: string }> {
-    const user = await this.validateUser(loginDto.username, loginDto.password, loginDto.departmentId);
-    const payload = { username: user.account, sub: user.id };
+    const user = await this.validateUser(loginDto.username, loginDto.password);
+    const payload = { username: user.account, sub: user.id , role: user.role.id};
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -65,5 +65,25 @@ export class AuthService {
     return Math.random().toString(36).slice(-8); // VD: "a1b2c3d4"
   }
 
+  async resetPassword(token: string, newPassword: string) {
+  let payload: ResetPasswordPayload;
+  try {
+    payload = await this.jwtService.verifyAsync<ResetPasswordPayload>(token, {
+      secret: process.env.JWT_SECRET,
+    });
+  } catch (err) {
+    throw new BadRequestException('Token không hợp lệ hoặc đã hết hạn');
+  }
+
+  const user = await this.userService.findById(payload.sub);
+  if (!user) {
+    throw new NotFoundException('Người dùng không tồn tại');
+  }
+
+  const updatePassword = await bcrypt.hash(newPassword, 10);
+  await this.userService.updatePassword(user.id, updatePassword);
+
+  return { message: 'Mật khẩu đã được cập nhật thành công' };
+  }
 
 }

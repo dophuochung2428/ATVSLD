@@ -20,7 +20,10 @@ export class UserService implements IUserService {
   }
 
   async findByAccount(account: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ account });
+    return this.userRepository.findOne({ 
+      where: { account },
+      relations: ['role'],
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
