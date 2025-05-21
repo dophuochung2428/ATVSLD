@@ -21,12 +21,12 @@ export class AuthService implements IAuthService{
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.userService.findByAccount(username);
     if (!user) {
-      throw new UnauthorizedException('Tài khoản không tồn tại');
+      throw new UnauthorizedException('Tài khoản hoặc mật khẩu không đúng. Xin vui lòng thử lại');
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      throw new UnauthorizedException('Mật khẩu không chính xác');
+      throw new UnauthorizedException('Tài khoản hoặc mật khẩu không đúng. Xin vui lòng thử lại');
     }
 
     return user;
@@ -34,6 +34,11 @@ export class AuthService implements IAuthService{
 
   async login(loginDto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.validateUser(loginDto.username, loginDto.password);
+
+    if (!loginDto.username || !loginDto.password) {
+      throw new BadRequestException('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
+    }
+
     const payload = { username: user.account, sub: user.id , role: user.role.id};
     return {
       access_token: this.jwtService.sign(payload),
