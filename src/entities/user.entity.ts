@@ -27,6 +27,9 @@ export class User{
     @Column({ type: 'date' })
     birthDay: Date;
 
+    @Column({ nullable: true })
+    phone: string;
+
     @ManyToOne(() => Role, role => role.users)
     @JoinColumn({ name: 'role_id' })
     role: Role;

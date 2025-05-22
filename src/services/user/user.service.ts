@@ -28,8 +28,8 @@ export class UserService implements IUserService {
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({ 
-      where: { email },
-      relations: ['department'], 
+        where: { email },
+        select: ['phone', 'fullName'],
     });
   }
 
@@ -43,5 +43,6 @@ export class UserService implements IUserService {
   async updatePassword(userId: number, hashedPassword: string): Promise<void> {
     await this.userRepository.update(userId, { password: hashedPassword });
   }
+
 
 }
