@@ -5,10 +5,15 @@ import { DepartmentService } from '../../services/department/department.service'
 import { DepartmentController } from '../../controllers/department.controller';
 import { UserModule } from '../user/user.module';
 import { User } from 'src/entities/user.entity';
+import { BusinessFile } from 'src/entities/business-file.entity';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
+import { RegionModule } from '../region/region.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Department, User]),
+  imports: [TypeOrmModule.forFeature([Department, User, BusinessFile]),
   UserModule, 
+  CloudinaryModule,
+  RegionModule,
 ],
   controllers: [DepartmentController],
   providers: [

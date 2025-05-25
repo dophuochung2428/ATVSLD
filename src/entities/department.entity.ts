@@ -26,17 +26,30 @@ export class Department {
   @Column({ type: 'boolean', default: true })
   status: boolean;
 
-  @Column({nullable: true })
-  city: string;
+  // Thành phố (từ regions.json)
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  region_level1_id: string;
 
-  @Column({ length: 30, nullable: true })
-  district: string;
+  // Quận/Huyện (từ regions.json)
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  region_level2_id: string;
 
-  @Column({ length: 30, nullable: true  })
-  ward: string;
+  // Phường/Xã (từ regions.json)
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  region_level3_id: string;
 
   @Column({nullable: true })
   address: string;
+
+  // thông tin người đứng đầu (head)
+  @Column({ length: 100, nullable: true })
+  headName: string;
+
+  @Column({ length: 100, nullable: true })
+  headEmail: string;
+
+  @Column({ length: 20, nullable: true })
+  headPhone: string;
 
   //thông tin liên hệ
   @Column({nullable: true })
@@ -45,28 +58,25 @@ export class Department {
   @Column({ nullable: true })
   phone?: string;
 
-  @Column({ nullable: true })
-  operationCity?: string;
+  // Khu vực hoạt động
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  operation_region_level1_id: string;
 
-  @Column({ nullable: true })
-  operationDistrict?: string;
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  operation_region_level2_id: string;
 
-  @Column({ nullable: true })
-  operationWard?: string;
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  operation_region_level3_id: string;
 
   @Column({ nullable: true })
   operationAddress?: string;
 
     // File đính kèm
   @OneToMany(() => BusinessFile, (file) => file.department, { cascade: true })
-  files: BusinessFile[];
-
-    // Người đứng đầu (trưởng phòng) - mỗi phòng có 1 người
-  @OneToOne(() => User, {nullable: true })
-  @JoinColumn()
-  head: User;
+  businessFiles: BusinessFile[];
 
     // Danh sách các user quản lý
   @OneToMany(() => User, (user) => user.department)
   users: User[];
+
 }

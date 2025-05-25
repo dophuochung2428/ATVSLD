@@ -12,6 +12,10 @@ export class BusinessFile {
   @Column()
   url: string; // Đường dẫn file nếu lưu trên Cloud
 
-  @ManyToOne(() => Department, (department) => department.files)
+  
+  @Column({nullable: true})
+  public_id: string;
+
+  @ManyToOne(() => Department, (department) => department.businessFiles, { onDelete: 'CASCADE' })
   department: Department;
 }

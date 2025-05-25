@@ -1,0 +1,1723 @@
+[
+      {
+      "level1_id": "79",
+      "name": "Thành phố Hồ Chí Minh",
+      "type": "Thành phố Trung ương",
+      "level2s": [
+        {
+          "level2_id": "760",
+          "name": "Quận 1",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "26734",
+              "name": "Phường Tân Định",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26737",
+              "name": "Phường Đa Kao",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26740",
+              "name": "Phường Bến Nghé",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26743",
+              "name": "Phường Bến Thành",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26746",
+              "name": "Phường Nguyễn Thái Bình",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26749",
+              "name": "Phường Phạm Ngũ Lão",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26752",
+              "name": "Phường Cầu Ông Lãnh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26755",
+              "name": "Phường Cô Giang",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26758",
+              "name": "Phường Nguyễn Cư Trinh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26761",
+              "name": "Phường Cầu Kho",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "761",
+          "name": "Quận 12",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "26764",
+              "name": "Phường Thạnh Xuân",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26767",
+              "name": "Phường Thạnh Lộc",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26770",
+              "name": "Phường Hiệp Thành",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26773",
+              "name": "Phường Thới An",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26776",
+              "name": "Phường Tân Chánh Hiệp",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26779",
+              "name": "Phường An Phú Đông",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26782",
+              "name": "Phường Tân Thới Hiệp",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26785",
+              "name": "Phường Trung Mỹ Tây",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26787",
+              "name": "Phường Tân Hưng Thuận",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26788",
+              "name": "Phường Đông Hưng Thuận",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26791",
+              "name": "Phường Tân Thới Nhất",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "764",
+          "name": "Quận Gò Vấp",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "26869",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26872",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26875",
+              "name": "Phường 17",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26876",
+              "name": "Phường 6",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26878",
+              "name": "Phường 16",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26881",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26882",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26884",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26887",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26890",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26893",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26896",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26897",
+              "name": "Phường 9",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26898",
+              "name": "Phường 8",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26899",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26902",
+              "name": "Phường 03",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "765",
+          "name": "Quận Bình Thạnh",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "26905",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26908",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26911",
+              "name": "Phường 27",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26914",
+              "name": "Phường 26",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26917",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26920",
+              "name": "Phường 25",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26923",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26926",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26929",
+              "name": "Phường 24",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26932",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26935",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26938",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26941",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26944",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26947",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26950",
+              "name": "Phường 17",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26953",
+              "name": "Phường 21",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26956",
+              "name": "Phường 22",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26959",
+              "name": "Phường 19",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26962",
+              "name": "Phường 28",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "766",
+          "name": "Quận Tân Bình",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "26965",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26968",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26971",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26974",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26977",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26980",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26983",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26986",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26989",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26992",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26995",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26998",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27001",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27004",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27007",
+              "name": "Phường 15",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "767",
+          "name": "Quận Tân Phú",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27010",
+              "name": "Phường Tân Sơn Nhì",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27013",
+              "name": "Phường Tây Thạnh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27016",
+              "name": "Phường Sơn Kỳ",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27019",
+              "name": "Phường Tân Quý",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27022",
+              "name": "Phường Tân Thành",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27025",
+              "name": "Phường Phú Thọ Hòa",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27028",
+              "name": "Phường Phú Thạnh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27031",
+              "name": "Phường Phú Trung",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27034",
+              "name": "Phường Hòa Thạnh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27037",
+              "name": "Phường Hiệp Tân",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27040",
+              "name": "Phường Tân Thới Hòa",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "768",
+          "name": "Quận Phú Nhuận",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27043",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27046",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27049",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27052",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27055",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27058",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27061",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27064",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27067",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27070",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27073",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27076",
+              "name": "Phường 17",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27085",
+              "name": "Phường 13",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "769",
+          "name": "Thành phố Thủ Đức",
+          "type": "Thành phố",
+          "level3s": [
+            {
+              "level3_id": "26794",
+              "name": "Phường Linh Xuân",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26797",
+              "name": "Phường Bình Chiểu",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26800",
+              "name": "Phường Linh Trung",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26803",
+              "name": "Phường Tam Bình",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26806",
+              "name": "Phường Tam Phú",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26809",
+              "name": "Phường Hiệp Bình Phước",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26812",
+              "name": "Phường Hiệp Bình Chánh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26815",
+              "name": "Phường Linh Chiểu",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26818",
+              "name": "Phường Linh Tây",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26821",
+              "name": "Phường Linh Đông",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26824",
+              "name": "Phường Bình Thọ",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26827",
+              "name": "Phường Trường Thọ",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26830",
+              "name": "Phường Long Bình",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26833",
+              "name": "Phường Long Thạnh Mỹ",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26836",
+              "name": "Phường Tân Phú",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26839",
+              "name": "Phường Hiệp Phú",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26842",
+              "name": "Phường Tăng Nhơn Phú A",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26845",
+              "name": "Phường Tăng Nhơn Phú B",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26848",
+              "name": "Phường Phước Long B",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26851",
+              "name": "Phường Phước Long A",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26854",
+              "name": "Phường Trường Thạnh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26857",
+              "name": "Phường Long Phước",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26860",
+              "name": "Phường Long Trường",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26863",
+              "name": "Phường Phước Bình",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "26866",
+              "name": "Phường Phú Hữu",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27088",
+              "name": "Phường Thảo Điền",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27091",
+              "name": "Phường An Phú",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27094",
+              "name": "Phường An Khánh",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27097",
+              "name": "Phường Bình Trưng Đông",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27100",
+              "name": "Phường Bình Trưng Tây",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27109",
+              "name": "Phường Cát Lái",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27112",
+              "name": "Phường Thạnh Mỹ Lợi",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27115",
+              "name": "Phường An Lợi Đông",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27118",
+              "name": "Phường Thủ Thiêm",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "770",
+          "name": "Quận 3",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27127",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27130",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27133",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27136",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27139",
+              "name": "Phường Võ Thị Sáu",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27142",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27145",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27148",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27151",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27154",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27157",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27160",
+              "name": "Phường 01",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "771",
+          "name": "Quận 10",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27163",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27166",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27169",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27172",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27175",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27178",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27181",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27184",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27187",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27190",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27193",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27196",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27199",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27202",
+              "name": "Phường 06",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "772",
+          "name": "Quận 11",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27208",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27211",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27214",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27217",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27220",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27223",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27226",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27229",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27232",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27235",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27238",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27241",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27244",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27247",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27250",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27253",
+              "name": "Phường 16",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "773",
+          "name": "Quận 4",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27259",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27262",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27265",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27268",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27271",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27277",
+              "name": "Phường 18",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27280",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27283",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27286",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27289",
+              "name": "Phường 16",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27292",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27295",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27298",
+              "name": "Phường 01",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "774",
+          "name": "Quận 5",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27301",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27304",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27307",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27310",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27313",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27316",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27322",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27325",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27328",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27331",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27334",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27337",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27340",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27343",
+              "name": "Phường 13",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "775",
+          "name": "Quận 6",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27346",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27349",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27352",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27355",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27358",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27361",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27364",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27367",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27370",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27373",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27376",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27379",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27382",
+              "name": "Phường 07",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27385",
+              "name": "Phường 10",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "776",
+          "name": "Quận 8",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27388",
+              "name": "Phường 08",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27391",
+              "name": "Phường 02",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27394",
+              "name": "Phường 01",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27397",
+              "name": "Phường 03",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27400",
+              "name": "Phường 11",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27403",
+              "name": "Phường 09",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27406",
+              "name": "Phường 10",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27409",
+              "name": "Phường 04",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27412",
+              "name": "Phường 13",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27415",
+              "name": "Phường 12",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27418",
+              "name": "Phường 05",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27421",
+              "name": "Phường 14",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27424",
+              "name": "Phường 06",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27427",
+              "name": "Phường 15",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27430",
+              "name": "Phường 16",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27433",
+              "name": "Phường 07",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "777",
+          "name": "Quận Bình Tân",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27436",
+              "name": "Phường Bình Hưng Hòa",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27439",
+              "name": "Phường Bình Hưng Hoà A",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27442",
+              "name": "Phường Bình Hưng Hoà B",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27445",
+              "name": "Phường Bình Trị Đông",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27448",
+              "name": "Phường Bình Trị Đông A",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27451",
+              "name": "Phường Bình Trị Đông B",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27454",
+              "name": "Phường Tân Tạo",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27457",
+              "name": "Phường Tân Tạo A",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27460",
+              "name": "Phường  An Lạc",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27463",
+              "name": "Phường An Lạc A",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "778",
+          "name": "Quận 7",
+          "type": "Quận",
+          "level3s": [
+            {
+              "level3_id": "27466",
+              "name": "Phường Tân Thuận Đông",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27469",
+              "name": "Phường Tân Thuận Tây",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27472",
+              "name": "Phường Tân Kiểng",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27475",
+              "name": "Phường Tân Hưng",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27478",
+              "name": "Phường Bình Thuận",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27481",
+              "name": "Phường Tân Quy",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27484",
+              "name": "Phường Phú Thuận",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27487",
+              "name": "Phường Tân Phú",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27490",
+              "name": "Phường Tân Phong",
+              "type": "Phường"
+            },
+            {
+              "level3_id": "27493",
+              "name": "Phường Phú Mỹ",
+              "type": "Phường"
+            }
+          ]
+        },
+        {
+          "level2_id": "783",
+          "name": "Huyện Củ Chi",
+          "type": "Huyện",
+          "level3s": [
+            {
+              "level3_id": "27496",
+              "name": "Thị trấn Củ Chi",
+              "type": "Thị trấn"
+            },
+            {
+              "level3_id": "27499",
+              "name": "Xã Phú Mỹ Hưng",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27502",
+              "name": "Xã An Phú",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27505",
+              "name": "Xã Trung Lập Thượng",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27508",
+              "name": "Xã An Nhơn Tây",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27511",
+              "name": "Xã Nhuận Đức",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27514",
+              "name": "Xã Phạm Văn Cội",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27517",
+              "name": "Xã Phú Hòa Đông",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27520",
+              "name": "Xã Trung Lập Hạ",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27523",
+              "name": "Xã Trung An",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27526",
+              "name": "Xã Phước Thạnh",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27529",
+              "name": "Xã Phước Hiệp",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27532",
+              "name": "Xã Tân An Hội",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27535",
+              "name": "Xã Phước Vĩnh An",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27538",
+              "name": "Xã Thái Mỹ",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27541",
+              "name": "Xã Tân Thạnh Tây",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27544",
+              "name": "Xã Hòa Phú",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27547",
+              "name": "Xã Tân Thạnh Đông",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27550",
+              "name": "Xã Bình Mỹ",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27553",
+              "name": "Xã Tân Phú Trung",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27556",
+              "name": "Xã Tân Thông Hội",
+              "type": "Xã"
+            }
+          ]
+        },
+        {
+          "level2_id": "784",
+          "name": "Huyện Hóc Môn",
+          "type": "Huyện",
+          "level3s": [
+            {
+              "level3_id": "27559",
+              "name": "Thị trấn Hóc Môn",
+              "type": "Thị trấn"
+            },
+            {
+              "level3_id": "27562",
+              "name": "Xã Tân Hiệp",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27565",
+              "name": "Xã Nhị Bình",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27568",
+              "name": "Xã Đông Thạnh",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27571",
+              "name": "Xã Tân Thới Nhì",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27574",
+              "name": "Xã Thới Tam Thôn",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27577",
+              "name": "Xã Xuân Thới Sơn",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27580",
+              "name": "Xã Tân Xuân",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27583",
+              "name": "Xã Xuân Thới Đông",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27586",
+              "name": "Xã Trung Chánh",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27589",
+              "name": "Xã Xuân Thới Thượng",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27592",
+              "name": "Xã Bà Điểm",
+              "type": "Xã"
+            }
+          ]
+        },
+        {
+          "level2_id": "785",
+          "name": "Huyện Bình Chánh",
+          "type": "Huyện",
+          "level3s": [
+            {
+              "level3_id": "27595",
+              "name": "Thị trấn Tân Túc",
+              "type": "Thị trấn"
+            },
+            {
+              "level3_id": "27598",
+              "name": "Xã Phạm Văn Hai",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27601",
+              "name": "Xã Vĩnh Lộc A",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27604",
+              "name": "Xã Vĩnh Lộc B",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27607",
+              "name": "Xã Bình Lợi",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27610",
+              "name": "Xã Lê Minh Xuân",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27613",
+              "name": "Xã Tân Nhựt",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27616",
+              "name": "Xã Tân Kiên",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27619",
+              "name": "Xã Bình Hưng",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27622",
+              "name": "Xã Phong Phú",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27625",
+              "name": "Xã An Phú Tây",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27628",
+              "name": "Xã Hưng Long",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27631",
+              "name": "Xã Đa Phước",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27634",
+              "name": "Xã Tân Quý Tây",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27637",
+              "name": "Xã Bình Chánh",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27640",
+              "name": "Xã Quy Đức",
+              "type": "Xã"
+            }
+          ]
+        },
+        {
+          "level2_id": "786",
+          "name": "Huyện Nhà Bè",
+          "type": "Huyện",
+          "level3s": [
+            {
+              "level3_id": "27643",
+              "name": "Thị trấn Nhà Bè",
+              "type": "Thị trấn"
+            },
+            {
+              "level3_id": "27646",
+              "name": "Xã Phước Kiển",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27649",
+              "name": "Xã Phước Lộc",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27652",
+              "name": "Xã Nhơn Đức",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27655",
+              "name": "Xã Phú Xuân",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27658",
+              "name": "Xã Long Thới",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27661",
+              "name": "Xã Hiệp Phước",
+              "type": "Xã"
+            }
+          ]
+        },
+        {
+          "level2_id": "787",
+          "name": "Huyện Cần Giờ",
+          "type": "Huyện",
+          "level3s": [
+            {
+              "level3_id": "27664",
+              "name": "Thị trấn Cần Thạnh",
+              "type": "Thị trấn"
+            },
+            {
+              "level3_id": "27667",
+              "name": "Xã Bình Khánh",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27670",
+              "name": "Xã Tam Thôn Hiệp",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27673",
+              "name": "Xã An Thới Đông",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27676",
+              "name": "Xã Thạnh An",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27679",
+              "name": "Xã Long Hòa",
+              "type": "Xã"
+            },
+            {
+              "level3_id": "27682",
+              "name": "Xã Lý Nhơn",
+              "type": "Xã"
+            }
+          ]
+        }
+      ]
+    }
+]
