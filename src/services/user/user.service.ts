@@ -29,7 +29,7 @@ export class UserService implements IUserService {
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOne({ 
         where: { email },
-        select: ['phone', 'fullName'],
+        relations: ['department'],
     });
   }
 

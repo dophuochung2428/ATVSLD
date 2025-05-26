@@ -12,6 +12,10 @@ import { BusinessTypeLabels } from 'src/enums/business-type.labels';
 import { RegionService } from '../region/region.service';
 import { plainToInstance } from 'class-transformer';
 import { UpdateDepartmentDto } from '@shared/dtos/department/update-department.dto';
+import { PaginationQueryDto } from '@shared/dtos/pagination/pagination-query.dto';
+import * as ExcelJS from 'exceljs';
+import { Response } from 'express';
+import { BusinessType } from 'src/enums/businessType.enum';
 
 
 @Injectable()
@@ -38,12 +42,22 @@ export class DepartmentService implements IDepartmentService {
       return { city, district, ward };
     }
 
-    async findAll(): Promise<DepartmentResponseDto[]> {
-      const departments = await this.departmentRepository.find();
+    async findAll(pagination: PaginationQueryDto) {
+    const { page = 1, limit = 10 } = pagination;
+    const [departments, total] = await this.departmentRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { registration_date: 'DESC' }, 
+    });
 
-    const rawData = await Promise.all(departments.map(async (dept) => {
-      const { city, district, ward } = await this.getRegionNames(dept.region_level1_id, dept.region_level2_id, dept.region_level3_id);
-      const { city: operationCity, district: operationDistrict, ward: operationWard } = await this.getRegionNames(
+    const rawData = await Promise.all(
+      departments.map(async (dept) => {
+      const { city, district, ward } = await this.getRegionNames(
+        dept.region_level1_id, 
+        dept.region_level2_id, 
+        dept.region_level3_id);
+      const { city: operationCity, district: operationDistrict, ward: operationWard } =
+       await this.getRegionNames(
         dept.operation_region_level1_id,
         dept.operation_region_level2_id,
         dept.operation_region_level3_id,
@@ -60,13 +74,27 @@ export class DepartmentService implements IDepartmentService {
         };
       }));
 
-      return plainToInstance(DepartmentResponseDto, rawData,{
-            excludeExtraneousValues: true,
+          const data = plainToInstance(DepartmentResponseDto, rawData, {
+          excludeExtraneousValues: true,
       });
+        return {
+          data,
+          meta: {
+            totalItems: total,
+            itemCount: data.length,
+            itemsPerPage: limit,
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+          },
+        };
     }
 
-    async findById(id: number): Promise<Department | null> {
-      return this.departmentRepository.findOneBy({ id });
+    async findById(id: number): Promise<Department> {
+      const department = await this.departmentRepository.findOne({ where: { id } });
+      if (!department) {
+        throw new NotFoundException(`Department with ID ${id} not found`);
+      }
+      return department;
     }
 
     async checkUserCanBeHead(email: string) {
@@ -286,5 +314,84 @@ export class DepartmentService implements IDepartmentService {
       } finally {
         await queryRunner.release();
       }
+    }
+
+    async exportToExcel(res: Response): Promise<void> {
+      const departments = await this.departmentRepository.find({
+        order: { registration_date: 'DESC' },
+      });
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Departments');
+
+      // Thêm header
+      worksheet.columns = [
+        { header: 'ID', key: 'id', width: 10 },
+        { header: 'Tên doanh nghiệp', key: 'name', width: 40 },
+        { header: 'Mã số thuế', key: 'tax_code', width: 20 },
+        { header: 'Loại hình kinh doanh', key: 'business_type', width: 25 },
+        { header: 'Ngành nghề kinh doanh', key: 'business_industry_code', width: 30},
+        { header: 'Thành phố', key: 'city', width: 30},
+        { header: 'Quận/ huyện', key: 'district', width: 20},
+        { header: 'Phường/ xã', key: 'ward', width: 20},
+
+        { header: 'Email trưởng phòng', key: 'headEmail', width: 15 },
+        { header: 'Ngày đăng ký', key: 'registration_date', width: 18 },
+        { header: 'Trạng thái', key: 'status', width: 15 },
+      ];
+
+       // Style cho header
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 12 };
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFEFEFEF' }, // màu xám nhạt
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' },
+        };
+      });
+
+      // Thêm dữ liệu
+      for (const dept of departments) {
+        const { city, district, ward } = await this.getRegionNames(
+          dept.region_level1_id,
+          dept.region_level2_id,
+          dept.region_level3_id,
+        );
+        const row = worksheet.addRow({
+          id: dept.id,
+          name: dept.name,
+          tax_code: dept.tax_code,
+          business_type: BusinessTypeLabels[dept.business_type as BusinessType] || 'Không xác định',
+          business_industry_code: dept.business_industry_code,
+          city: city || 'Không xác định',
+          district: district || 'Không xác định',
+          ward: ward || 'Không xác định',
+
+          headEmail: dept.headEmail,
+          registration_date: dept.registration_date      
+          ? new Date(dept.registration_date).toLocaleDateString('vi-VN')
+          : '',
+          status: dept.status ? 'Hoạt động' : 'Ngưng hoạt động',
+        });
+            // Style cho từng dòng (căn trái, viền nhẹ nếu muốn)
+        row.eachCell((cell) => {
+          cell.alignment = { vertical: 'middle', horizontal: 'left' };
+        });
+      };
+
+      // Gửi file về client
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=departments.xlsx');
+
+      await workbook.xlsx.write(res);
+      res.end();
     }
 }

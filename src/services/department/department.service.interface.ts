@@ -2,9 +2,11 @@ import { CreateDepartmentDto } from '@shared/dtos/department/create-department.d
 import { Department } from '../../entities/department.entity';
 import { DepartmentResponseDto } from '@shared/dtos/department/department-response.dto';
 import { UpdateDepartmentDto } from '@shared/dtos/department/update-department.dto';
+import { PaginationQueryDto } from '@shared/dtos/pagination/pagination-query.dto';
+import { Response } from 'express';
 
 export interface IDepartmentService {
-  findAll(): Promise<DepartmentResponseDto[]>
+  findAll(pagination: PaginationQueryDto)
   findById(id: number): Promise<Department | null>
   checkUserCanBeHead(email: string)
   create(
@@ -25,4 +27,5 @@ export interface IDepartmentService {
           other_document?: Express.Multer.File[],
         },
       ): Promise<Department>
+  exportToExcel(res: Response): Promise<void>
 }

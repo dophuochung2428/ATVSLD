@@ -1,15 +1,15 @@
-import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res } from '@nestjs/common';
 import { Department } from '../entities/department.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { IDepartmentService } from 'src/services/department/department.service.interface';
-import { CreateDepartmentDto } from '@shared/dtos/department/create-department.dto';
-import { DepartmentResponseDto } from '@shared/dtos/department/department-response.dto';
 import { IUserService } from 'src/services/user/user.service.interface';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateDepartmentWithFilesDto } from '@shared/dtos/department/create-department-with-file.dto';
 import { DeleteManyDto } from '@shared/dtos/department/delete-many.dto';
 import { UpdateDepartmentWithFilesDto } from '@shared/dtos/department/update-department-with-files.dto';
+import { PaginationQueryDto } from '@shared/dtos/pagination/pagination-query.dto';
+import { Response } from 'express';
 
 @ApiTags('Department')
 @ApiBearerAuth('JWT-auth')
@@ -24,9 +24,9 @@ export class DepartmentController {
   ) {}
 
     @Get()
-    @ApiOperation({ summary: 'Get Department List' })
-    async getAllDepartMents(): Promise<DepartmentResponseDto[]> {
-      return this.departmentService.findAll();
+    @ApiOperation({ summary: 'Get Department List( có phân trang)' })
+    async getAllDepartMents(@Query() query: PaginationQueryDto) {
+      return this.departmentService.findAll(query);
     }
 
 
@@ -89,7 +89,7 @@ export class DepartmentController {
       return this.departmentService.deleteMany(body.ids);
     }
 
-
+    @ApiOperation({ summary: 'Cập nhật department theo id' })
     @Put(':id')
     @UseInterceptors(FileFieldsInterceptor([
       { name: 'business_license', maxCount: 1 },
@@ -107,6 +107,21 @@ export class DepartmentController {
     ) {
       return this.departmentService.update(id, updateDto, files);
     }
+
+    @Get('export')
+    @ApiOperation({ summary: 'Export danh sách ra Excel' })
+    async exportExcel(@Res() res: Response): Promise<void> {
+      await this.departmentService.exportToExcel(res);
+    }
+
+    @ApiOperation({ summary: 'Lấy chi tiết phòng ban theo ID' })
+    @ApiParam({ name: 'id', description: 'ID của phòng ban' })
+    @Get(':id')
+    async getDepartmentById(@Param('id') id: number) {
+      return this.departmentService.findById(id);
+    }
+
+
 
 
 }
