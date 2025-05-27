@@ -48,6 +48,7 @@ export class DepartmentService implements IDepartmentService {
       skip: (page - 1) * limit,
       take: limit,
       order: { registration_date: 'DESC' }, 
+      relations: ['businessFiles'],
     });
 
     const rawData = await Promise.all(
@@ -71,6 +72,11 @@ export class DepartmentService implements IDepartmentService {
           operationCity,
           operationDistrict,
           operationWard,
+          business_file: dept.businessFiles.map(file => ({
+            id: file.id,
+            name: file.name,
+            url: file.url
+          }))
         };
       }));
 
@@ -90,7 +96,10 @@ export class DepartmentService implements IDepartmentService {
     }
 
     async findById(id: number): Promise<Department> {
-      const department = await this.departmentRepository.findOne({ where: { id } });
+      const department = await this.departmentRepository.findOne({ 
+        where: { id } ,
+        relations: ['businessFiles'],
+      });
       if (!department) {
         throw new NotFoundException(`Department with ID ${id} not found`);
       }
@@ -109,6 +118,19 @@ export class DepartmentService implements IDepartmentService {
       }
       return user;
   }
+
+  async checkTaxCode(taxCode: string): Promise<{ isAvailable: boolean; message: string }> {
+    const existing = await this.departmentRepository.findOne({
+    where: { tax_code: taxCode }, });
+
+    return {
+      isAvailable: !existing,
+      message: existing
+        ? `Mã số thuế '${taxCode}' đã tồn tại.`
+        : `Mã số thuế '${taxCode}' có thể sử dụng.`,
+    };
+  }
+
     // Hàm upfile lên cloudinary
     private async uploadBusinessFile(
       files: Express.Multer.File[] | undefined,
@@ -132,6 +154,13 @@ export class DepartmentService implements IDepartmentService {
         other_document?: Express.Multer.File[],
       }
     ): Promise<Department> {
+      
+      if (createDto.tax_code?.trim()) {
+        const isValid = await this.checkTaxCode(createDto.tax_code.trim());
+        if (!isValid) {
+          throw new BadRequestException('Mã số thuế không hợp lệ');
+        }
+      }
       const department = this.departmentRepository.create(createDto);
 
       if (createDto.headEmail) {
@@ -239,9 +268,7 @@ export class DepartmentService implements IDepartmentService {
       });
     }
 
-    async update(
-      id: number,
-      updateDto: UpdateDepartmentDto,
+    async update( id: number, updateDto: UpdateDepartmentDto,
       files?: {
         business_license?: Express.Multer.File[],
         other_document?: Express.Multer.File[],
@@ -261,18 +288,19 @@ export class DepartmentService implements IDepartmentService {
           throw new NotFoundException(`Không tìm thấy Department với id: ${id}`);
         }
 
+        const trimmedTaxCode = updateDto.tax_code?.trim();
+        if(trimmedTaxCode && trimmedTaxCode!== department.tax_code){
+          const check = await this.checkTaxCode(trimmedTaxCode);
+          if (!check.isAvailable) {
+            throw new BadRequestException(check.message);
+          }
+          department.tax_code = trimmedTaxCode;
+        }
         // Xử lý trưởng phòng cũ nếu thay đổi headEmail
-        if (updateDto.headEmail && updateDto.headEmail !== department.headEmail) {
+        const trimmedHeadEmail = updateDto.headEmail?.trim();
+        if (  trimmedHeadEmail && // không null/undefined/rỗng
+              trimmedHeadEmail !== department.headEmail) {
           const newHead = await this.checkUserCanBeHead(updateDto.headEmail);
-
-          // // Tìm user cũ (nếu có) và xoá liên kết
-          // if (department.headEmail) {
-          //   const oldHead = await this.userRepository.findOneBy({ email: department.headEmail });
-          //   if (oldHead) {
-          //     oldHead.department = null;
-          //     await queryRunner.manager.save(oldHead);
-          //   }
-          // }
 
           // Gán user mới làm trưởng phòng
           department.headEmail = newHead.email;
@@ -280,8 +308,12 @@ export class DepartmentService implements IDepartmentService {
           await queryRunner.manager.save(newHead);
         }
 
-        // Cập nhật các trường còn lại
-        Object.assign(department, updateDto);
+        // Cập nhật các trường còn lại nếu có giá trị hợp lệ
+        Object.entries(updateDto).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            department[key] = value;
+          }
+        });
         await queryRunner.manager.save(department);
 
         // Xử lý file (xóa cũ, upload mới)
@@ -316,6 +348,7 @@ export class DepartmentService implements IDepartmentService {
       }
     }
 
+    //xuất excel
     async exportToExcel(res: Response): Promise<void> {
       const departments = await this.departmentRepository.find({
         order: { registration_date: 'DESC' },

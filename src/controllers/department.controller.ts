@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res, BadRequestException } from '@nestjs/common';
 import { Department } from '../entities/department.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -114,12 +114,23 @@ export class DepartmentController {
       await this.departmentService.exportToExcel(res);
     }
 
+    @ApiOperation({ summary: 'Check mã số thuế' })
+    @Get('check-tax-code')
+    async checkTaxCode(@Query('taxCode') taxCode: string) {
+      if (!taxCode?.trim()) {
+        throw new BadRequestException('Thiếu mã số thuế');
+      }
+
+      return await this.departmentService.checkTaxCode(taxCode.trim());
+    }
+
     @ApiOperation({ summary: 'Lấy chi tiết phòng ban theo ID' })
     @ApiParam({ name: 'id', description: 'ID của phòng ban' })
     @Get(':id')
     async getDepartmentById(@Param('id') id: number) {
       return this.departmentService.findById(id);
     }
+
 
 
 

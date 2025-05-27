@@ -1,6 +1,12 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { BusinessType } from '../../../../src/enums/businessType.enum';
+import { BusinessFile } from 'src/entities/business-file.entity';
 
+class BusinessFileDto {
+  @Expose() id: number;
+  @Expose() name: string;
+  @Expose() url: string;
+}
 @Exclude()
 export class DepartmentResponseDto {
   @Expose() id: number;
@@ -28,4 +34,8 @@ export class DepartmentResponseDto {
   @Expose() operationDistrict?: string;
   @Expose() operationWard?: string;
   @Expose() operationAddress?: string;
+
+  @Expose()   
+  @Type(() => BusinessFileDto)
+  business_file?: BusinessFileDto[];
 }

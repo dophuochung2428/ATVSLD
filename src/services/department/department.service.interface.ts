@@ -28,4 +28,5 @@ export interface IDepartmentService {
         },
       ): Promise<Department>
   exportToExcel(res: Response): Promise<void>
+  checkTaxCode(tax_code: string): Promise<{ isAvailable: boolean; message: string }>
 }
