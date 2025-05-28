@@ -17,6 +17,7 @@ export class CloudinaryService implements ICloudinaryService{
 
   async uploadFile(file: Express.Multer.File): Promise<{ secure_url: string; public_id: string  }> {
     const resourceType = file.mimetype.startsWith('image/') ? 'image' : 'raw';
+
     return new Promise((resolve, reject) => {
       const upload = cloudinary.uploader.upload_stream(
         { 
@@ -26,12 +27,8 @@ export class CloudinaryService implements ICloudinaryService{
         (error, result) => {
           if (error) return reject(error);
           if (!result) return reject(new Error('Upload failed: no result returned'));
-          // Tạo secure_url thủ công nếu là raw
-          const secure_url =
-            resourceType === 'raw'
-              ? `https://res.cloudinary.com/${cloudinary.config().cloud_name}/raw/upload/${result.public_id}`
-              : result.secure_url;
-          resolve({ secure_url, public_id: result.public_id });
+
+          resolve({ secure_url: result.secure_url, public_id: result.public_id });
         },
       );
 
