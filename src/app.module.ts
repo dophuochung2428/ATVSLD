@@ -5,6 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { PermissionModule } from './modules/permission/permission.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
         AuthModule,
         DepartmentModule,
         CloudinaryModule,
+        PermissionModule,
   ],
 
 })

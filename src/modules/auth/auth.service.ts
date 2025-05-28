@@ -61,7 +61,8 @@ export class AuthService implements IAuthService{
 
     // Send email
     const loginUrl = 'https://your-frontend/login'; 
-    await this.mailService.sendPasswordRecoveryEmail(user.email, newPassword, loginUrl, user.account, user.department.name);
+    const departmentName = user.department?.name ?? 'Phòng ban không xác định';
+    await this.mailService.sendPasswordRecoveryEmail(user.email, newPassword, loginUrl, user.account, departmentName);
 
     return 'Mật khẩu mới đã được gửi qua email. Vui lòng kiểm tra hộp thư!';
   }
