@@ -4,8 +4,8 @@ import { JwtAuthGuard } from "src/modules/auth/jwt.guard";
 import { IPermissionService } from "src/services/permission/permission.service.interface";
 
 @ApiTags('Permission')
-@ApiBearerAuth('JWT-auth')
-@UseGuards(JwtAuthGuard)
+// @ApiBearerAuth('JWT-auth')
+// @UseGuards(JwtAuthGuard)
 @Controller('permissions')
 export class PermissionController {
   constructor(

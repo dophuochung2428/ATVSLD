@@ -23,6 +23,9 @@ export class CloudinaryService implements ICloudinaryService{
         { 
           folder: 'atvsld',
           resource_type: resourceType,
+          use_filename: true,// Dùng tên file gốc
+          unique_filename: false,          // Không thêm chuỗi ngẫu nhiên
+          filename_override: file.originalname// Đảm bảo tên file có đuôi .pdf
          },
         (error, result) => {
           if (error) return reject(error);

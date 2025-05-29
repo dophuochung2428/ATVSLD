@@ -1,14 +1,18 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { User } from './user.entity';
+import { RolePermission } from './role-permission.entity';
 
-@Entity()
+@Entity('role')
 export class Role {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ unique: true })
+  code: string;
+
+  @Column()
   name: string;
 
-  @OneToMany(() => User, user => user.role)
-  users: User[];
+  @OneToMany(() => RolePermission, (rp) => rp.role, { cascade: true })
+  rolePermissions: RolePermission[];
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable } from 'typeorm';
 import { Role } from './role.entity';
 import { Department } from './department.entity';
 import { Gender } from '../enums/gender.enum';
@@ -30,7 +30,7 @@ export class User{
     @Column({ nullable: true })
     phone: string;
 
-    @ManyToOne(() => Role, role => role.users)
+    @ManyToOne(() => Role, { eager: true })
     @JoinColumn({ name: 'role_id' })
     role: Role;
 

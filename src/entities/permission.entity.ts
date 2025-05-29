@@ -10,7 +10,7 @@ export class Permission {
   @Column({ type: 'enum', enum: PermissionType, })
   type: PermissionType;
 
-  @Column()
+  @Column({unique: true})
   code: string;
 
   @Column()
