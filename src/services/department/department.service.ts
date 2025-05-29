@@ -289,20 +289,21 @@ export class DepartmentService implements IDepartmentService {
         throw new NotFoundException(`Không tìm thấy Department với id: ${id}`);
       }
 
-      const rawTaxCode = updateDto.tax_code;
-      const trimmedTaxCode = typeof rawTaxCode === 'string'
-        ? rawTaxCode.trim()
-        : rawTaxCode != null
-          ? String(rawTaxCode).trim()
-          : undefined;
+      // const rawTaxCode = updateDto.tax_code;
+      // const trimmedTaxCode = typeof rawTaxCode === 'string'
+      //   ? rawTaxCode.trim()
+      //   : rawTaxCode != null
+      //     ? String(rawTaxCode).trim()
+      //     : undefined;
 
-      if (trimmedTaxCode && trimmedTaxCode !== department.tax_code) {
-        const check = await this.checkTaxCode(trimmedTaxCode);
-        if (!check.isAvailable) {
-          throw new BadRequestException(check.message);
-        }
-        department.tax_code = trimmedTaxCode;
-      }
+      // if (trimmedTaxCode && trimmedTaxCode !== department.tax_code) {
+      //   const check = await this.checkTaxCode(trimmedTaxCode);
+      //   if (!check.isAvailable) {
+      //     throw new BadRequestException(check.message);
+      //   }
+      //   department.tax_code = trimmedTaxCode;
+      // }
+
       // Xử lý trưởng phòng cũ nếu thay đổi headEmail
       const trimmedHeadEmail = updateDto.headEmail?.trim();
       if (trimmedHeadEmail && // không null/undefined/rỗng
@@ -318,7 +319,12 @@ export class DepartmentService implements IDepartmentService {
 
       // Cập nhật các trường còn lại nếu có giá trị hợp lệ
       Object.entries(updateDto).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
+        if (
+          key !== 'tax_code' &&
+          value !== undefined &&
+          value !== null &&
+          value !== ''
+        ) {
           department[key] = value;
         }
       });

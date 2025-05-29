@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateRoleDto } from "@shared/dtos/role/create-role.dto";
 import { Permission } from "src/entities/permission.entity";
@@ -108,5 +108,22 @@ export class RoleService implements IRoleService {
       return updatedRole;
     });
   }
+
+  async deleteRoles(ids: string[]): Promise<void> {
+  return await this.dataSource.transaction(async (manager) => {
+
+    const roles = await manager.findBy(Role, { id: In(ids) });
+    if (roles.length !== ids.length) {
+      throw new NotFoundException('Có role không tồn tại');
+    }
+
+
+    await manager.delete(RolePermission, { role: { id: In(ids) } });
+
+
+    await manager.delete(Role, { id: In(ids) });
+  });
+}
+
 
 }

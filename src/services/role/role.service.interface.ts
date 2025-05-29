@@ -7,4 +7,5 @@ export interface IRoleService {
   createRole(dto: CreateRoleDto): Promise<Role> 
   updateRole(id: string, dto: UpdateRoleDto): Promise<Role>
   getById(id: string): Promise<Role>
+  deleteRoles(ids: string[]): Promise<void>
 }
