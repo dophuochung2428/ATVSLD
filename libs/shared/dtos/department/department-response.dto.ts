@@ -38,4 +38,10 @@ export class DepartmentResponseDto {
   @Expose()   
   @Type(() => BusinessFileDto)
   business_file?: BusinessFileDto[];
+
+  // getter chỉ để lấy mảng url từ businessFiles
+  @Expose({ name: 'businessFilesUrls' })
+  get businessFilesUrls(): string[] {
+    return this.business_file?.map(f => f.url) || [];
+  }
 }

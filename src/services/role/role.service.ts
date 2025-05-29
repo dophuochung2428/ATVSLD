@@ -6,6 +6,7 @@ import { RolePermission } from "src/entities/role-permission.entity";
 import { Role } from "src/entities/role.entity";
 import { DataSource, In, Not, Repository } from "typeorm";
 import { IRoleService } from "./role.service.interface";
+import { UpdateRoleDto } from "@shared/dtos/role/update-role.dto";
 
 @Injectable()
 export class RoleService implements IRoleService {
@@ -62,8 +63,8 @@ export class RoleService implements IRoleService {
     });
   }
 
-  async updateRole(id: string, dto: CreateRoleDto): Promise<Role> {
-    const { code, name, permissionIds } = dto;
+  async updateRole(id: string, dto: UpdateRoleDto): Promise<Role> {
+    const { name, permissionIds } = dto;
 
     return await this.dataSource.transaction(async (manager) => {
 

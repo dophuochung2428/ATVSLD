@@ -315,6 +315,7 @@ export class DepartmentService implements IDepartmentService {
         await queryRunner.manager.save(newHead);
       }
 
+
       // Cập nhật các trường còn lại nếu có giá trị hợp lệ
       Object.entries(updateDto).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
@@ -346,6 +347,7 @@ export class DepartmentService implements IDepartmentService {
       }
 
       await queryRunner.commitTransaction();
+      
       return department;
     } catch (err) {
       await queryRunner.rollbackTransaction();
