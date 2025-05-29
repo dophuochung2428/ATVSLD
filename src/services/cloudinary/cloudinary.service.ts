@@ -3,6 +3,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { ICloudinaryService } from './cloudinary.service.interface';
 import * as streamifier from 'streamifier';
+import * as fs from 'fs';
 
 @Injectable()
 export class CloudinaryService implements ICloudinaryService{
@@ -16,6 +17,7 @@ export class CloudinaryService implements ICloudinaryService{
   }
 
   async uploadFile(file: Express.Multer.File): Promise<{ secure_url: string; public_id: string  }> {
+
     const resourceType = file.mimetype.startsWith('image/') ? 'image' : 'raw';
 
     return new Promise((resolve, reject) => {
