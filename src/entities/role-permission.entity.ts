@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Role } from "./role.entity";
 import { Permission } from "./permission.entity";
 
@@ -17,4 +17,8 @@ export class RolePermission {
     onDelete: 'CASCADE',
   })
   permission: Permission;
+
+  
+  @Column({ default: false })
+  status: boolean;
 }

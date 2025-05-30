@@ -16,6 +16,13 @@ export class RoleController {
     @Inject('IRoleService')
     private readonly roleService: IRoleService) { }
 
+  @Get()
+    @ApiOperation({ summary: 'Lấy danh sách Role' })
+  async getAllRoles(): Promise<Role[]> {
+    return this.roleService.getAllRoles();
+  }
+
+
   @Post()
   @ApiOperation({ summary: 'Tạo một Role mới' })
   @ApiBody({ type: CreateRoleDto })
@@ -24,7 +31,7 @@ export class RoleController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Lấy danh sách Role' })
+  @ApiOperation({ summary: 'Lấy Role_Per theo id' })
   async getById(@Param('id', ParseUUIDPipe) id: string): Promise<Role> {
     return this.roleService.getById(id);
   }

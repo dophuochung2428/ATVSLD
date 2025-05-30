@@ -20,6 +20,13 @@ export class RoleService implements IRoleService {
     private rolePermissionRepo: Repository<RolePermission>,
   ) { }
 
+  async getAllRoles(): Promise<Role[]> {
+    return await this.roleRepo.find({
+      relations: ['rolePermissions', 'rolePermissions.permission'],
+      order: { name: 'ASC' },
+    });
+  }
+
   async getById(id: string): Promise<Role> {
     const role = await this.roleRepo.findOne({
       where: { id },
@@ -31,7 +38,7 @@ export class RoleService implements IRoleService {
 
 
   async createRole(dto: CreateRoleDto): Promise<Role> {
-    const { code, name, permissionIds } = dto;
+    const { code, name, permissionIds = [] } = dto;
 
     return await this.dataSource.transaction(async (manager) => {
 
@@ -45,17 +52,19 @@ export class RoleService implements IRoleService {
       const role = manager.create(Role, { code, name });
       await manager.save(role);
 
-      // Lấy list permission
-      const permissions = await manager.findBy(Permission, {
-        id: In(permissionIds),
+      const allPermissions = await manager.find(Permission, {
+        relations: ['parent'],
       });
-      if (permissions.length !== permissionIds.length) {
-        throw new BadRequestException('Có permission không hợp lệ');
-      }
+
+      const childPermissions = allPermissions.filter(p => p.parent !== null);
 
       // Gán permission
-      const rolePermissions = permissions.map((perm) =>
-        manager.create(RolePermission, { role, permission: perm }),
+      const rolePermissions = childPermissions.map((perm) =>
+        manager.create(RolePermission, {
+          role,
+          permission: perm,
+          status: permissionIds.includes(perm.id),
+        }),
       );
       await manager.save(rolePermissions);
 
@@ -74,56 +83,40 @@ export class RoleService implements IRoleService {
       role.name = name;
       await manager.save(role);
 
-      const oldPerms = await manager.find(RolePermission, {
+      const rolePermissions = await manager.find(RolePermission, {
         where: { role: { id } },
         relations: ['permission'],
       });
-      const oldIds = oldPerms.map(rp => rp.permission.id);
-
-      const toAdd = permissionIds.filter(pid => !oldIds.includes(pid));
-      const toRemove = oldIds.filter(pid => !permissionIds.includes(pid));
-
-      if (toAdd.length > 0) {
-        const permsToAdd = await manager.findBy(Permission, { id: In(toAdd) });
-        if (permsToAdd.length !== toAdd.length) {
-          throw new BadRequestException('Có permission không hợp lệ');
-        }
-        const newRPs = permsToAdd.map(p =>
-          manager.create(RolePermission, { role, permission: p }),
-        );
-        await manager.save(newRPs);
+      for (const rp of rolePermissions) {
+        rp.status = permissionIds.includes(rp.permission.id);
       }
 
-      if (toRemove.length > 0) {
-        await manager.delete(RolePermission, {
-          role: { id },
-          permission: { id: In(toRemove) },
-        });
-      }
 
+      await manager.save(rolePermissions);
       const updatedRole = await manager.findOne(Role, {
         where: { id: role.id },
         relations: ['rolePermissions', 'rolePermissions.permission'],
       });
+
       return updatedRole;
     });
   }
 
   async deleteRoles(ids: string[]): Promise<void> {
-  return await this.dataSource.transaction(async (manager) => {
+    return await this.dataSource.transaction(async (manager) => {
 
-    const roles = await manager.findBy(Role, { id: In(ids) });
-    if (roles.length !== ids.length) {
-      throw new NotFoundException('Có role không tồn tại');
-    }
-
-
-    await manager.delete(RolePermission, { role: { id: In(ids) } });
+      const roles = await manager.findBy(Role, { id: In(ids) });
+      if (roles.length !== ids.length) {
+        throw new NotFoundException('Có role không tồn tại');
+      }
 
 
-    await manager.delete(Role, { id: In(ids) });
-  });
-}
+      await manager.delete(RolePermission, { role: { id: In(ids) } });
+
+
+      await manager.delete(Role, { id: In(ids) });
+    });
+  }
 
 
 }
