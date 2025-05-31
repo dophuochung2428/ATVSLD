@@ -289,23 +289,25 @@ export class DepartmentService implements IDepartmentService {
         throw new NotFoundException(`Không tìm thấy Department với id: ${id}`);
       }
 
-      // Xử lý trưởng phòng cũ nếu thay đổi headEmail
-      const trimmedHeadEmail = updateDto.headEmail?.trim();
-      if (trimmedHeadEmail && // không null/undefined/rỗng
-        trimmedHeadEmail !== department.headEmail) {
-        const newHead = await this.checkUserCanBeHead(updateDto.headEmail);
+      // // Xử lý trưởng phòng cũ nếu thay đổi headEmail
+      // const trimmedHeadEmail = updateDto.headEmail?.trim();
+      // if (trimmedHeadEmail && // không null/undefined/rỗng
+      //   trimmedHeadEmail !== department.headEmail) {
+      //   const newHead = await this.checkUserCanBeHead(updateDto.headEmail);
 
-        // Gán user mới làm trưởng phòng
-        department.headEmail = newHead.email;
-        newHead.department = department;
-        await queryRunner.manager.save(newHead);
-      }
+      //   // Gán user mới làm trưởng phòng
+      //   department.headEmail = newHead.email;
+      //   newHead.department = department;
+      //   await queryRunner.manager.save(newHead);
+      // }
 
+console.log('updateDto:', updateDto);
 
       // Cập nhật các trường còn lại nếu có giá trị hợp lệ
       Object.entries(updateDto).forEach(([key, value]) => {
         if (
           key !== 'tax_code' &&
+          key !== 'id' &&
           value !== undefined &&
           value !== null &&
           value !== ''
@@ -313,7 +315,12 @@ export class DepartmentService implements IDepartmentService {
           department[key] = value;
         }
       });
-      await queryRunner.manager.save(department);
+
+      console.log('Department trước khi save:', department);
+
+      const saved = await queryRunner.manager.save(department);
+
+      console.log('Department sau khi save:', saved);
 
       // Xử lý file (xóa cũ, upload mới)
       const newBusinessFiles = [];
