@@ -11,7 +11,7 @@ export class Department {
   @Column({ length: 30 })
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, unique: true })
   tax_code: string;
 
   @Column({ type: 'enum', enum: BusinessType, nullable: true ,})

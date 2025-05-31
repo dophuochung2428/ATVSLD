@@ -158,7 +158,7 @@ export class DepartmentService implements IDepartmentService {
 
     if (createDto.tax_code?.trim()) {
       const isValid = await this.checkTaxCode(createDto.tax_code.trim());
-      if (!isValid) {
+      if (!isValid.isAvailable) {
         throw new BadRequestException('Mã số thuế không hợp lệ');
       }
     }
@@ -288,21 +288,6 @@ export class DepartmentService implements IDepartmentService {
       if (!department) {
         throw new NotFoundException(`Không tìm thấy Department với id: ${id}`);
       }
-
-      // const rawTaxCode = updateDto.tax_code;
-      // const trimmedTaxCode = typeof rawTaxCode === 'string'
-      //   ? rawTaxCode.trim()
-      //   : rawTaxCode != null
-      //     ? String(rawTaxCode).trim()
-      //     : undefined;
-
-      // if (trimmedTaxCode && trimmedTaxCode !== department.tax_code) {
-      //   const check = await this.checkTaxCode(trimmedTaxCode);
-      //   if (!check.isAvailable) {
-      //     throw new BadRequestException(check.message);
-      //   }
-      //   department.tax_code = trimmedTaxCode;
-      // }
 
       // Xử lý trưởng phòng cũ nếu thay đổi headEmail
       const trimmedHeadEmail = updateDto.headEmail?.trim();

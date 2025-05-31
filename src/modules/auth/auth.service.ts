@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException, BadRequestException, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../../services/user/user.service'; 
+import { UserService } from '../../services/user/user.service';
 import { MailService } from '../mail/mail.service';
 import { User } from '../../entities/user.entity';
 import { LoginDto } from './dto/login.dto';
@@ -10,13 +10,13 @@ import { NotFoundException } from '@nestjs/common';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { IUserService } from 'src/services/user/user.service.interface';
 @Injectable()
-export class AuthService implements IAuthService{
+export class AuthService implements IAuthService {
   constructor(
     @Inject('IUserService')
     private readonly userService: IUserService,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
-  ) {}
+  ) { }
 
   async validateUser(username: string, password: string): Promise<User | null> {
     const user = await this.userService.findByAccount(username);
@@ -39,7 +39,7 @@ export class AuthService implements IAuthService{
       throw new BadRequestException('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
     }
 
-    const payload = { username: user.account, sub: user.id , role: user.role.id};
+    const payload = { sub: user.id, role: user.role.code };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -60,7 +60,7 @@ export class AuthService implements IAuthService{
     await this.userService.updatePassword(user.id, hashedPassword);
 
     // Send email
-    const loginUrl = 'https://your-frontend/login'; 
+    const loginUrl = 'https://your-frontend/login';
     const departmentName = user.department?.name ?? 'Phòng ban không xác định';
     await this.mailService.sendPasswordRecoveryEmail(user.email, newPassword, loginUrl, user.account, departmentName);
 
@@ -68,28 +68,28 @@ export class AuthService implements IAuthService{
   }
 
   private generateRandomPassword(): string {
-    return Math.random().toString(36).slice(-8); // VD: "a1b2c3d4"
+    return Math.random().toString(36).slice(-8); 
   }
 
   async resetPassword(token: string, newPassword: string) {
-  let payload: ResetPasswordPayload;
-  try {
-    payload = await this.jwtService.verifyAsync<ResetPasswordPayload>(token, {
-      secret: process.env.JWT_SECRET,
-    });
-  } catch (err) {
-    throw new BadRequestException('Token không hợp lệ hoặc đã hết hạn');
-  }
+    let payload: ResetPasswordPayload;
+    try {
+      payload = await this.jwtService.verifyAsync<ResetPasswordPayload>(token, {
+        secret: process.env.JWT_SECRET,
+      });
+    } catch (err) {
+      throw new BadRequestException('Token không hợp lệ hoặc đã hết hạn');
+    }
 
-  const user = await this.userService.findById(payload.sub);
-  if (!user) {
-    throw new NotFoundException('Người dùng không tồn tại');
-  }
+    const user = await this.userService.findById(payload.sub);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
 
-  const updatePassword = await bcrypt.hash(newPassword, 10);
-  await this.userService.updatePassword(user.id, updatePassword);
+    const updatePassword = await bcrypt.hash(newPassword, 10);
+    await this.userService.updatePassword(user.id, updatePassword);
 
-  return { message: 'Mật khẩu đã được cập nhật thành công' };
+    return { message: 'Mật khẩu đã được cập nhật thành công' };
   }
 
 }
