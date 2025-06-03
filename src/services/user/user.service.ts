@@ -9,27 +9,47 @@ export class UserService implements IUserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
 
   async findById(id: number): Promise<User | null> {
-    return this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission'],
+    });
+    if (user) {
+      delete user.password;
+    }
+    return user;
+  }
+
+  async findByIdWithStatusTrue(id: number): Promise<User | null> {
+    const user = await this.userRepository.createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndSelect('role.rolePermissions', 'rolePermissions', 'rolePermissions.status = :status', { status: true })
+      .leftJoinAndSelect('rolePermissions.permission', 'permission')
+      .where('user.id = :id', { id })
+      .getOne();
+    if (user) {
+      delete user.password;
+    }
+    return user;
   }
 
   async findByAccount(account: string): Promise<User | null> {
-    return this.userRepository.findOne({ 
+    return this.userRepository.findOne({
       where: { account },
       relations: ['role'],
     });
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ 
-        where: { email },
-        relations: ['department'],
+    return this.userRepository.findOne({
+      where: { email },
+      relations: ['department'],
     });
   }
 

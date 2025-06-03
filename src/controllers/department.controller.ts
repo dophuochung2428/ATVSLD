@@ -1,10 +1,10 @@
-import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res, BadRequestException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res, BadRequestException, UploadedFile } from '@nestjs/common';
 import { Department } from '../entities/department.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { IDepartmentService } from 'src/services/department/department.service.interface';
 import { IUserService } from 'src/services/user/user.service.interface';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { CreateDepartmentWithFilesDto } from '@shared/dtos/department/create-department-with-file.dto';
 import { DeleteManyDto } from '@shared/dtos/department/delete-many.dto';
 import { UpdateDepartmentWithFilesDto } from '@shared/dtos/department/update-department-with-files.dto';
@@ -12,6 +12,11 @@ import { PaginationQueryDto } from '@shared/dtos/pagination/pagination-query.dto
 import { Response } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { DepartmentResponseDto } from '@shared/dtos/department/department-response.dto';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Permissions } from 'src/modules/auth/permissions.decorator';
+import { AuthGuard } from '@nestjs/passport';
+import { PermissionsGuard } from 'src/modules/auth/permissions.guard';
 
 @ApiTags('Department')
 @ApiBearerAuth('JWT-auth')
@@ -25,6 +30,8 @@ export class DepartmentController {
     private readonly userService: IUserService,
   ) { }
 
+  @Permissions('ADMIN_C_DEPARTMENT_VIEW')
+  @UseGuards(PermissionsGuard) 
   @Get()
   @ApiOperation({ summary: 'Get Department List( có phân trang)' })
   async getAllDepartMents(@Query() query: PaginationQueryDto) {
@@ -119,10 +126,46 @@ export class DepartmentController {
     return dto;
   }
 
-  @Get('export')
+  @Post('export')
   @ApiOperation({ summary: 'Export danh sách ra Excel' })
-  async exportExcel(@Res() res: Response): Promise<void> {
-    await this.departmentService.exportToExcel(res);
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: { type: 'string' },
+          example: ['id1', 'id2']
+        },
+      },
+      required: ['ids'],
+    }
+  })
+  async exportExcel(@Body() body: { ids: number[] }, @Res() res: Response): Promise<void> {
+    if (!body.ids || body.ids.length === 0) {
+      throw new BadRequestException('Vui lòng chọn ít nhất một phòng ban để xuất Excel.');
+    }
+    await this.departmentService.exportToExcel(body.ids, res);
+  }
+
+
+  @Post('import-excel')
+  @ApiOperation({ summary: 'Thêm bằng file excel' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async importExcel(@UploadedFile() file: Express.Multer.File) {
+    return this.departmentService.importFromExcel(file);
   }
 
   @ApiOperation({ summary: 'Check mã số thuế' })

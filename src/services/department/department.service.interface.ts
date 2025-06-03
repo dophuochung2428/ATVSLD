@@ -10,23 +10,24 @@ export interface IDepartmentService {
   findById(id: number): Promise<Department | null>
   checkUserCanBeHead(email: string)
   create(
-      createDto: CreateDepartmentDto,
-        files: {
-        business_license?: Express.Multer.File[],
-        other_document?: Express.Multer.File[],
-      }
-    ): Promise<Department>
+    createDto: CreateDepartmentDto,
+    files: {
+      business_license?: Express.Multer.File[],
+      other_document?: Express.Multer.File[],
+    }
+  ): Promise<Department>
   toggleStatus(id: number): Promise<void>
   deleteOne(id: number): Promise<void>
   deleteMany(ids: number[]): Promise<{ deleted: number }>
   update(
-        id: number,
-        updateDto: UpdateDepartmentDto,
-        files?: {
-          business_license?: Express.Multer.File[],
-          other_document?: Express.Multer.File[],
-        },
-      ): Promise<Department>
-  exportToExcel(res: Response): Promise<void>
+    id: number,
+    updateDto: UpdateDepartmentDto,
+    files?: {
+      business_license?: Express.Multer.File[],
+      other_document?: Express.Multer.File[],
+    },
+  ): Promise<Department>
+  exportToExcel(ids: number[], res: Response): Promise<void>
   checkTaxCode(tax_code: string): Promise<{ isAvailable: boolean; message: string }>
+  importFromExcel(file: Express.Multer.File)
 }

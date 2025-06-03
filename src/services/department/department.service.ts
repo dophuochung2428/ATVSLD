@@ -301,8 +301,6 @@ export class DepartmentService implements IDepartmentService {
       //   await queryRunner.manager.save(newHead);
       // }
 
-console.log('updateDto:', updateDto);
-
       // Cập nhật các trường còn lại nếu có giá trị hợp lệ
       Object.entries(updateDto).forEach(([key, value]) => {
         if (
@@ -316,11 +314,7 @@ console.log('updateDto:', updateDto);
         }
       });
 
-      console.log('Department trước khi save:', department);
-
-      const saved = await queryRunner.manager.save(department);
-
-      console.log('Department sau khi save:', saved);
+      await queryRunner.manager.save(department);
 
       // Xử lý file (xóa cũ, upload mới)
       const newBusinessFiles = [];
@@ -345,7 +339,7 @@ console.log('updateDto:', updateDto);
       }
 
       await queryRunner.commitTransaction();
-      
+
       return department;
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -356,10 +350,14 @@ console.log('updateDto:', updateDto);
   }
 
   //xuất excel
-  async exportToExcel(res: Response): Promise<void> {
+  async exportToExcel(ids: number[], res: Response): Promise<void> {
     const departments = await this.departmentRepository.find({
+      where: { id: In(ids) },
+      relations: ['businessFiles'],
       order: { registration_date: 'DESC' },
+
     });
+
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Departments');
@@ -371,13 +369,18 @@ console.log('updateDto:', updateDto);
       { header: 'Mã số thuế', key: 'tax_code', width: 20 },
       { header: 'Loại hình kinh doanh', key: 'business_type', width: 25 },
       { header: 'Ngành nghề kinh doanh', key: 'business_industry_code', width: 30 },
+
       { header: 'Thành phố', key: 'city', width: 30 },
       { header: 'Quận/ huyện', key: 'district', width: 20 },
       { header: 'Phường/ xã', key: 'ward', width: 20 },
+      { header: 'Địa chỉ', key: 'address', width: 40 },
 
       { header: 'Email trưởng phòng', key: 'headEmail', width: 15 },
       { header: 'Ngày đăng ký', key: 'registration_date', width: 18 },
       { header: 'Trạng thái', key: 'status', width: 15 },
+
+      { header: 'Giấy phép kinh doanh (URL)', key: 'licenseBusinessUrl', width: 40 },
+      { header: 'URL Giấy phép khác (URL)', key: 'ortherLicenseUrl', width: 40 },
     ];
 
     // Style cho header
@@ -405,6 +408,14 @@ console.log('updateDto:', updateDto);
         dept.region_level2_id,
         dept.region_level3_id,
       );
+
+      const licenseBusiness = dept.businessFiles?.find(f =>
+        f.name?.toLowerCase().includes('kinh doanh')
+      );
+      const ortherLicense = dept.businessFiles?.find(f =>
+        f.name?.toLowerCase().includes('Giấy tờ')
+      );
+
       const row = worksheet.addRow({
         id: dept.id,
         name: dept.name,
@@ -414,12 +425,15 @@ console.log('updateDto:', updateDto);
         city: city || 'Không xác định',
         district: district || 'Không xác định',
         ward: ward || 'Không xác định',
+        address: dept.address || 'Không xác định',
 
         headEmail: dept.headEmail,
         registration_date: dept.registration_date
           ? new Date(dept.registration_date).toLocaleDateString('vi-VN')
           : '',
         status: dept.status ? 'Hoạt động' : 'Ngưng hoạt động',
+        licenseBusinessUrl: licenseBusiness?.url ?? '',
+        ortherLicenseUrl: ortherLicense?.url ?? '',
       });
       // Style cho từng dòng (căn trái, viền nhẹ nếu muốn)
       row.eachCell((cell) => {
@@ -433,5 +447,91 @@ console.log('updateDto:', updateDto);
 
     await workbook.xlsx.write(res);
     res.end();
+  }
+
+
+  async importFromExcel(file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('File is required');
+
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(file.buffer);
+    const worksheet = workbook.worksheets[0];
+
+    const departments: Department[] = [];
+    const skipped: { row: number; reason: string }[] = [];
+
+    for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
+      const row = worksheet.getRow(rowNumber);
+
+      const name = row.getCell(1).text.trim();
+      const tax_code = row.getCell(2).text.trim();
+      const business_type = row.getCell(3).text.trim() as BusinessType;
+      if (!Object.values(BusinessType).includes(business_type)) {
+        skipped.push({ row: rowNumber, reason: 'Invalid business_type' });
+        return;
+      }
+
+      const industry_code = row.getCell(4).text.trim();
+      const city = row.getCell(5).text.trim();
+      const district = row.getCell(6).text.trim();
+      const ward = row.getCell(7).text.trim();
+      const address = row.getCell(8).text.trim();
+      const headName = row.getCell(9).text.trim();
+
+      const registration_date = row.getCell(10).text.trim();
+
+      const headEmail = row.getCell(11).text.trim();
+      const headPhone = row.getCell(12).text.trim();
+
+      if (!tax_code) {
+        skipped.push({ row: rowNumber, reason: 'Missing tax_code' });
+        return;
+      }
+
+      const existed = await this.departmentRepository.findOne({ where: { tax_code } });
+      if (existed) {
+        skipped.push({ row: rowNumber, reason: `Duplicate tax_code ${tax_code}` });
+        return;
+      }
+
+      const { level1Id, level2Id, level3Id } =
+        this.regionService.getRegionIdsByNames(city, district, ward);
+
+      const department = this.departmentRepository.create({
+        name,
+        tax_code,
+        region_level1_id: level1Id,
+        region_level2_id: level2Id,
+        region_level3_id: level3Id,
+        address,
+        business_type,
+        business_industry_code: industry_code,
+        registration_date: this.parseExcelDate(registration_date),
+        headName,
+        headEmail,
+        headPhone,
+      });
+
+      departments.push(department);
+    };
+
+    await this.departmentRepository.save(departments);
+    return { message: 'Import thành công', total: departments.length, skipped, };
+  }
+
+
+  private parseExcelDate(value: string): Date | null {
+    if (!value) return null;
+
+    const parts = value.split('/');
+    if (parts.length === 3) {
+      const [day, month, year] = parts.map(part => Number(part.trim()));
+      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+        return new Date(year, month - 1, day); // month - 1 vì JS đếm tháng từ 0
+      }
+    }
+
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
   }
 }
