@@ -3,9 +3,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
 import { UserService } from '../../services/user/user.service';
 import { UserController } from '../../controllers/user.controller';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module';
+import { Role } from 'src/entities/role.entity';
+import { Department } from 'src/entities/department.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, Role, Department]),
+    CloudinaryModule
+  ],
   controllers: [UserController],
   providers: [
     {
@@ -15,4 +20,4 @@ import { UserController } from '../../controllers/user.controller';
   ],
   exports: ['IUserService'],
 })
-export class UserModule {}
+export class UserModule { }

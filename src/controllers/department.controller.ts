@@ -31,14 +31,14 @@ export class DepartmentController {
   ) { }
 
   @Permissions('ADMIN_C_DEPARTMENT_VIEW')
-  @UseGuards(PermissionsGuard) 
+  @UseGuards(PermissionsGuard)
   @Get()
   @ApiOperation({ summary: 'Get Department List( có phân trang)' })
   async getAllDepartMents(@Query() query: PaginationQueryDto) {
     return this.departmentService.findAll(query);
   }
 
-
+  @Permissions('ADMIN_C_DEPARTMENT_CREATE')
   @Post()
   @ApiOperation({ summary: 'Tạo một Department mới' })
   @ApiConsumes('multipart/form-data')
@@ -86,18 +86,21 @@ export class DepartmentController {
     await this.departmentService.toggleStatus(id);
   }
 
+  @Permissions('ADMIN_C_DEPARTMENT_DELETE')
   @ApiOperation({ summary: 'Xóa 1 department theo id' })
   @Delete(':id')
   async deleteOne(@Param('id', ParseIntPipe) id: number) {
     return this.departmentService.deleteOne(id);
   }
 
+  @Permissions('ADMIN_C_DEPARTMENT_DELETE')
   @ApiOperation({ summary: 'Xóa nhiều department theo id' })
   @Delete()
   async deleteMany(@Body() body: DeleteManyDto) {
     return this.departmentService.deleteMany(body.ids);
   }
 
+  @Permissions('ADMIN_C_DEPARTMENT_UPDATE')
   @ApiOperation({ summary: 'Cập nhật department theo id' })
   @Put(':id')
   @UseInterceptors(FileFieldsInterceptor([
@@ -148,7 +151,7 @@ export class DepartmentController {
     await this.departmentService.exportToExcel(body.ids, res);
   }
 
-
+  @Permissions('ADMIN_C_DEPARTMENT_CREATE')
   @Post('import-excel')
   @ApiOperation({ summary: 'Thêm bằng file excel' })
   @ApiConsumes('multipart/form-data')

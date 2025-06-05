@@ -3,15 +3,18 @@ import { Role } from './role.entity';
 import { Department } from './department.entity';
 import { Gender } from '../enums/gender.enum';
 import * as bcrypt from 'bcrypt';
+import { UserType } from 'src/enums/userType.enum';
+import { Exclude } from 'class-transformer';
 
 @Entity()
-export class User{
+export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ length: 100, unique: true })
     account: string;
 
+    @Exclude()
     @Column()
     password: string;
 
@@ -21,18 +24,43 @@ export class User{
     @Column({ nullable: true })
     jobTitle: string;
 
-    @Column({type: 'enum', enum: Gender, })
-    gender: Gender;
+    @Column({
+        type: 'enum',
+        enum: UserType,
+        nullable: true,
+    })
+    userType: UserType;
 
-    @Column({ type: 'date' })
-    birthDay: Date;
-
-    @Column({ nullable: true })
-    phone: string;
+    @ManyToOne(() => Department, department => department.users)
+    @JoinColumn({ name: 'department_id' })
+    department: Department;
 
     @ManyToOne(() => Role, { eager: true })
     @JoinColumn({ name: 'role_id' })
     role: Role;
+
+
+
+    @Column({ type: 'date' })
+    birthDay: Date;
+
+    @Column({ type: 'enum', enum: Gender, })
+    gender: Gender;
+
+    // Thành phố (từ regions.json)
+    @Column({ type: 'varchar', length: 10, nullable: true })
+    city: string;
+
+    // Quận/Huyện (từ regions.json)
+    @Column({ type: 'varchar', length: 10, nullable: true })
+    district: string;
+
+    // Phường/Xã (từ regions.json)
+    @Column({ type: 'varchar', length: 10, nullable: true })
+    ward: string;
+
+    @Column({ nullable: true })
+    phone: string;
 
     @Column({ length: 100, unique: true })
     email: string;
@@ -40,16 +68,19 @@ export class User{
     @Column({ nullable: true })
     address: string;
 
-    @ManyToOne(() => Department, department => department.users)
-    @JoinColumn({ name: 'department_id' })
-    department: Department;
+    @Column({ type: 'boolean', default: true })
+    status: boolean;
+
+    @Column({ nullable: true })
+    avatar: string;
+
 
     @BeforeInsert()
     @BeforeUpdate()
     async hashPassword() {
         if (this.password) {
-        const salt = await bcrypt.genSalt();
-        this.password = await bcrypt.hash(this.password, salt);
+            const salt = await bcrypt.genSalt();
+            this.password = await bcrypt.hash(this.password, salt);
         }
     }
 }
