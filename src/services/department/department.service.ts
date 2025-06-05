@@ -413,7 +413,7 @@ export class DepartmentService implements IDepartmentService {
         f.name?.toLowerCase().includes('kinh doanh')
       );
       const ortherLicense = dept.businessFiles?.find(f =>
-        f.name?.toLowerCase().includes('Giấy tờ')
+        f.name?.toLowerCase().includes('khác')
       );
 
       const row = worksheet.addRow({

@@ -184,7 +184,7 @@ export class DepartmentController {
   @ApiOperation({ summary: 'Lấy chi tiết phòng ban theo ID' })
   @ApiParam({ name: 'id', description: 'ID của phòng ban' })
   @Get(':id')
-  async getDepartmentById(@Param('id') id: number) {
+  async getDepartmentById(@Param('id', ParseIntPipe) id: number) {
     return this.departmentService.findById(id);
   }
 
