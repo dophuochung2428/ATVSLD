@@ -17,8 +17,4 @@ export class RolePermission {
     onDelete: 'CASCADE',
   })
   permission: Permission;
-
-  
-  @Column({ default: false })
-  status: boolean;
 }

@@ -8,8 +8,8 @@ import { JwtAuthGuard } from "src/modules/auth/jwt.guard";
 import { IRoleService } from "src/services/role/role.service.interface";
 
 @ApiTags('Role')
-// @ApiBearerAuth('JWT-auth')
-// @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
 @Controller('roles')
 export class RoleController {
   constructor(

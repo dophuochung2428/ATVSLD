@@ -39,8 +39,6 @@ export class User {
     @JoinColumn({ name: 'role_id' })
     role: Role;
 
-
-
     @Column({ type: 'date' })
     birthDay: Date;
 
@@ -62,7 +60,7 @@ export class User {
     @Column({ nullable: true })
     phone: string;
 
-    @Column({ length: 100, unique: true })
+    @Column({ length: 100 })
     email: string;
 
     @Column({ nullable: true })

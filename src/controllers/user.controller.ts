@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -8,6 +8,7 @@ import { UserDto } from '@shared/dtos/user/user.dto';
 import { CreateUserDto } from '@shared/dtos/user/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ICloudinaryService } from 'src/services/cloudinary/cloudinary.service.interface';
+import { UpdateUserDto } from '@shared/dtos/user/update-user.dto';
 
 @ApiTags('User')
 @ApiBearerAuth('JWT-auth')
@@ -53,6 +54,43 @@ export class UserController {
     return plainToInstance(UserDto, newUser, { excludeExtraneousValues: true });
   }
 
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Update user' })
+  @ApiBody({ type: UpdateUserDto })
+  async updateUser(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() avatarFile: Express.Multer.File,
+    @Body() dto: UpdateUserDto
+  ): Promise<UserDto> {
+    if (avatarFile) {
+      const uploadResult = await this.cloudinaryService.uploadFile(avatarFile);
+      dto.avatar = uploadResult.secure_url;
+    }
 
+    const updated = await this.userService.update(id, dto);
+    return plainToInstance(UserDto, updated, { excludeExtraneousValues: true });
+  }
+
+
+  @Delete()
+  @ApiOperation({ summary: 'Delete one or many users by ID(s)' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: { type: 'integer' },
+          example: [1, 2, 3]
+        }
+      },
+      required: ['ids']
+    }
+  })
+  async deleteUsers(@Body('ids') ids: number[]): Promise<void> {
+    await this.userService.deleteMany(ids);
+  }
 
 }

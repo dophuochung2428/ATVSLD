@@ -36,6 +36,16 @@ export class RoleService implements IRoleService {
     return role;
   }
 
+  async getByCode(code: string): Promise<Role> {
+    const role = await this.roleRepo.findOne({
+      where: { code },
+      relations: ['rolePermissions', 'rolePermissions.permission'],
+    });
+
+    if (!role) throw new BadRequestException('Role không tồn tại');
+    return role;
+  }
+
 
   async createRole(dto: CreateRoleDto): Promise<Role> {
     const { code, name, permissionIds = [] } = dto;
@@ -52,18 +62,15 @@ export class RoleService implements IRoleService {
       const role = manager.create(Role, { code, name });
       await manager.save(role);
 
-      const allPermissions = await manager.find(Permission, {
-        relations: ['parent'],
+      const selectedPermissions = await manager.findBy(Permission, {
+        id: In(permissionIds),
       });
 
-      const childPermissions = allPermissions.filter(p => p.parent !== null);
-
       // Gán permission
-      const rolePermissions = childPermissions.map((perm) =>
+      const rolePermissions = selectedPermissions.map((perm) =>
         manager.create(RolePermission, {
           role,
           permission: perm,
-          status: permissionIds.includes(perm.id),
         }),
       );
       await manager.save(rolePermissions);
@@ -73,7 +80,7 @@ export class RoleService implements IRoleService {
   }
 
   async updateRole(id: string, dto: UpdateRoleDto): Promise<Role> {
-    const { name, permissionIds } = dto;
+    const { name, permissionIds = [] } = dto;
 
     return await this.dataSource.transaction(async (manager) => {
 
@@ -83,18 +90,41 @@ export class RoleService implements IRoleService {
       role.name = name;
       await manager.save(role);
 
-      const rolePermissions = await manager.find(RolePermission, {
+      const currentRolePermissions = await manager.find(RolePermission, {
         where: { role: { id } },
         relations: ['permission'],
       });
-      for (const rp of rolePermissions) {
-        rp.status = permissionIds.includes(rp.permission.id);
+
+      const currentPermissionIds = currentRolePermissions.map(rp => rp.permission.id);
+
+      // Tính toán permission cần thêm và cần xóa
+      const toAddIds = permissionIds.filter(id => !currentPermissionIds.includes(id));
+      const toRemoveIds = currentPermissionIds.filter(id => !permissionIds.includes(id));
+
+      // Xóa các permission không còn
+      if (toRemoveIds.length > 0) {
+        await manager.delete(RolePermission, {
+          role: { id },
+          permission: In(toRemoveIds),
+        });
       }
 
+      // Thêm các permission mới
+      if (toAddIds.length > 0) {
+        const permissionsToAdd = await manager.findBy(Permission, { id: In(toAddIds) });
 
-      await manager.save(rolePermissions);
+        const newRolePermissions = permissionsToAdd.map((perm) =>
+          manager.create(RolePermission, {
+            role,
+            permission: perm,
+          }),
+        );
+        await manager.save(newRolePermissions);
+      }
+
+      // Trả về role đã cập nhật kèm permissions
       const updatedRole = await manager.findOne(Role, {
-        where: { id: role.id },
+        where: { id },
         relations: ['rolePermissions', 'rolePermissions.permission'],
       });
 

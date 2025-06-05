@@ -9,7 +9,10 @@ export class CreateUserDto {
   @IsString()
   account: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Abcd1@34',
+    description: 'Mật khẩu người dùng (mặc định là Abcd1@34 nếu không nhập)',
+  })
   @IsString()
   password: string;
 
@@ -40,16 +43,24 @@ export class CreateUserDto {
   @IsEnum(Gender)
   gender: Gender;
 
-  @ApiPropertyOptional()
-  @ApiProperty()
+  @ApiProperty({
+    example: 'BUSINESS',
+    description: 'ADMIN hoặc BUSINESS',
+  })
   @IsEnum(UserType)
   userType: UserType;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'chỉ truyền vào nếu userType là admin',
+  })
+  @IsOptional()
   @IsString()
   roleId: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({
+    description: 'chỉ truyền vào nếu userType là business',
+  })
+  @IsOptional()
   @IsNumber()
   departmentId?: number;
 

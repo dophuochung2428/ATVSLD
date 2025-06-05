@@ -6,10 +6,12 @@ import { UserController } from '../../controllers/user.controller';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { Role } from 'src/entities/role.entity';
 import { Department } from 'src/entities/department.entity';
+import { RoleModule } from '../role/role.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Role, Department]),
-    CloudinaryModule
+    CloudinaryModule,
+    RoleModule
   ],
   controllers: [UserController],
   providers: [
