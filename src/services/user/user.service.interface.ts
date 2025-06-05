@@ -9,7 +9,7 @@ export interface IUserService {
   findByAccount(account: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   findByAccountWithDepartment(account: string): Promise<User | null>;
-  // findByIdWithStatusTrue(id: number): Promise<User | null>
+  findPermissionWithRoleId(id: number): Promise<User | null>
   updatePassword(userId: number, hashedPassword: string): Promise<void>;
   create(dto: CreateUserDto): Promise<User>
   update(id: number, dto: UpdateUserDto): Promise<User>

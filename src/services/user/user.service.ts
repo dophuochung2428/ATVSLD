@@ -47,25 +47,24 @@ export class UserService implements IUserService {
     return user;
   }
 
-  // async findByIdWithStatusTrue(id: number): Promise<User | null> {
-  //   const user = await this.userRepository.findOne({
-  //     where: { id, status: true },
-  //     relations: {
-  //       role: {
-  //         rolePermissions: {
-  //           permission: true,
-  //         },
-  //       },
-  //     },
-  //   });
+  async findPermissionWithRoleId(id: number): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { id, status: true },
+      relations: {
+        role: {
+          rolePermissions: {
+            permission: true,
+          },
+        },
+      },
+    });
 
-  //   if (user) {
-  //     user.role.rolePermissions = user.role.rolePermissions.filter(rp => rp.status);
-  //     delete user.password;
-  //   }
+    if (user) {
+      delete user.password;
+    }
 
-  //   return user;
-  // }
+    return user;
+  }
 
 
   async findByAccount(account: string): Promise<User | null> {
