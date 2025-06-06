@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus, Res, BadRequestException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -9,6 +9,7 @@ import { CreateUserDto } from '@shared/dtos/user/create-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ICloudinaryService } from 'src/services/cloudinary/cloudinary.service.interface';
 import { UpdateUserDto } from '@shared/dtos/user/update-user.dto';
+import { Response } from 'express';
 
 @ApiTags('User')
 @ApiBearerAuth('JWT-auth')
@@ -22,11 +23,20 @@ export class UserController {
     private readonly cloudinaryService: ICloudinaryService,
   ) { }
 
-  @Get()
-  @ApiOperation({ summary: 'Get User List' })
-  async getAllUsers(): Promise<UserDto[]> {
-    const users = await this.userService.findAll();
-    return plainToInstance(UserDto, users, { excludeExtraneousValues: true });
+  @Get('by-account/:account')
+  @ApiOperation({ summary: 'Get User by Account' })
+  @ApiParam({ name: 'account', type: 'string', description: 'Account name (username)' })
+  async getUserByAccount(@Param('account') account: string): Promise<UserDto> {
+    const user = await this.userService.findByAccount(account);
+    return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
+  }
+
+  @Get('by-email/:email')
+  @ApiOperation({ summary: 'Get User by Email' })
+  @ApiParam({ name: 'email', type: 'string', description: 'Email của user' })
+  async getUserByEmail(@Param('email') email: string): Promise<UserDto> {
+    const user = await this.userService.findByEmail(email);
+    return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 
   @Get(':id')
@@ -35,6 +45,15 @@ export class UserController {
     const user = await this.userService.findById(id);
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
+
+  @Get()
+  @ApiOperation({ summary: 'Get User List' })
+  async getAllUsers(): Promise<UserDto[]> {
+    const users = await this.userService.findAll();
+    return plainToInstance(UserDto, users, { excludeExtraneousValues: true });
+  }
+
+
 
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
@@ -108,5 +127,28 @@ export class UserController {
   ): Promise<void> {
     await this.userService.toggleStatus(id);
   }
+
+    @Post('export-excel')
+    @ApiOperation({ summary: 'Export danh sách User ra Excel' })
+    @ApiBody({
+      schema: {
+        type: 'object',
+        properties: {
+          ids: {
+            type: 'array',
+            items: { type: 'string' },
+            example: ['id1', 'id2']
+          },
+        },
+        required: ['ids'],
+      }
+    })
+    async exportExcel(@Body() body: { ids: number[] }, @Res() res: Response): Promise<void> {
+      if (!body.ids || body.ids.length === 0) {
+        throw new BadRequestException('Vui lòng chọn ít nhất một user để xuất Excel.');
+      }
+      await this.userService.exportUsersToExcel(body.ids, res);
+    }
+
 
 }

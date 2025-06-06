@@ -8,8 +8,11 @@ import { Role } from 'src/entities/role.entity';
 import { Department } from 'src/entities/department.entity';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDto } from '@shared/dtos/user/update-user.dto';
-import { UserType } from 'src/enums/userType.enum';
+import { UserType, UserTypeLabel } from 'src/enums/userType.enum';
 import { IRoleService } from '../role/role.service.interface';
+import { UserDto } from '@shared/dtos/user/user.dto';
+import * as ExcelJS from 'exceljs';
+import { Response } from 'express';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -68,17 +71,15 @@ export class UserService implements IUserService {
 
 
   async findByAccount(account: string): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: { account },
-      relations: ['role'],
-    });
+    const user = await this.userRepository.findOne({ where: { account }, relations: ['role', 'department'] });
+    if (!user) throw new NotFoundException(`User with account ${account} not found`);
+    return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: { email },
-      relations: ['department'],
-    });
+    const user = await this.userRepository.findOne({ where: { email }, relations: ['role', 'department'] });
+    if (!user) throw new NotFoundException(`User with email ${email} not found`);
+    return user;
   }
 
   async findByAccountWithDepartment(account: string): Promise<User | null> {
@@ -101,8 +102,7 @@ export class UserService implements IUserService {
     const defaultPassword = 'Abcd1@34';
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-    user.password = hashedPassword;
-    await this.userRepository.save(user);
+    await this.updatePassword(user.id, hashedPassword);
   }
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -110,6 +110,7 @@ export class UserService implements IUserService {
 
     const user = this.userRepository.create(rest);
     user.password = await bcrypt.hash(rest.password, 10);
+    user.userType = userType;
 
     if (userType === UserType.BUSINESS) {
       if (!departmentId) {
@@ -197,4 +198,65 @@ export class UserService implements IUserService {
 
     await this.userRepository.save(user);
   }
+
+  async exportUsersToExcel(ids: number[], res: Response): Promise<void> {
+    const users = await this.userRepository.find({
+      where: { id: In(ids) },
+      relations: ['department', 'role']
+    })
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Users');
+
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+      { header: 'Account', key: 'account', width: 20 },
+      { header: 'Full Name', key: 'fullName', width: 30 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Phone', key: 'phone', width: 15 },
+      { header: 'Job Title', key: 'jobTitle', width: 20 },
+      { header: 'Address', key: 'address', width: 40 },
+      { header: 'Birth Day', key: 'birthDay', width: 15 },
+      { header: 'Gender', key: 'gender', width: 10 },
+      { header: 'User Type', key: 'userTypeLabel', width: 15 },
+      { header: 'Status', key: 'status', width: 10 },
+      { header: 'City', key: 'city', width: 15 },
+      { header: 'District', key: 'district', width: 15 },
+      { header: 'Ward', key: 'ward', width: 15 },
+      { header: 'Department', key: 'departmentName', width: 20 },
+      { header: 'Role', key: 'roleName', width: 20 },
+      { header: 'Avatar URL', key: 'avatar', width: 40 },
+    ];
+
+    // Thêm dữ liệu user
+    users.forEach(user => {
+      worksheet.addRow({
+        id: user.id,
+        account: user.account,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        jobTitle: user.jobTitle,
+        address: user.address,
+        birthDay: user.birthDay ? new Date(user.birthDay).toLocaleDateString('vi-VN') : '',
+        gender: user.gender,
+        userTypeLabel: UserTypeLabel[user.userType],
+        status: user.status ? 'Active' : 'Inactive',
+        city: user.city,
+        district: user.district,
+        ward: user.ward,
+        departmentName: user.department?.name,
+        roleName: user.role?.name,
+        avatar: user.avatar,
+      });
+    });
+
+    // Gửi file về client
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
+
+    await workbook.xlsx.write(res);
+    res.end();
+  }
+
 }

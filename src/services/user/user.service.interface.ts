@@ -1,6 +1,7 @@
 import { CreateUserDto } from '@shared/dtos/user/create-user.dto';
 import { User } from '../../entities/user.entity';
 import { UpdateUserDto } from '@shared/dtos/user/update-user.dto';
+import { Response } from 'express';
 
 export interface IUserService {
   findAll(): Promise<User[]>;
@@ -16,4 +17,5 @@ export interface IUserService {
   deleteMany(ids: number[]): Promise<void>
   toggleStatus(id: number): Promise<void> 
   resetPassword(userId: number): Promise<void>
+  exportUsersToExcel(ids: number[], res: Response): Promise<void> 
 }

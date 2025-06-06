@@ -7,29 +7,31 @@ import {
   IsString,
 } from 'class-validator';
 import { Gender } from 'src/enums/gender.enum';
+import { REGION_LEVEL1_IDS, REGION_LEVEL1_LABELS, REGION_LEVEL2_IDS, REGION_LEVEL2_LABELS, REGION_LEVEL3_IDS, REGION_LEVEL3_LABELS } from '../department/region.constants';
+
 
 export class UpdateUserDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: 'Nguyễn Văn A' })
   @IsOptional()
   @IsString()
   fullName?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: 'Kỹ sư phần mềm' })
   @IsOptional()
   @IsString()
   jobTitle?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: '0909123456' })
   @IsOptional()
   @IsString()
   phone?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: '1999-05-01' })
   @IsOptional()
   @IsDateString()
   birthDay?: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: Gender.MALE, enum: Gender })
   @IsOptional()
   @IsEnum(Gender)
   gender?: Gender;
@@ -48,17 +50,26 @@ export class UpdateUserDto {
   @IsString()
   roleId?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: REGION_LEVEL1_IDS,
+    example: '79'
+  })
   @IsOptional()
   @IsString()
   city?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: REGION_LEVEL2_IDS,
+    example: '760'
+  })
   @IsOptional()
   @IsString()
   district?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: REGION_LEVEL3_IDS,
+    example: '26734'
+  })
   @IsOptional()
   @IsString()
   ward?: string;
@@ -74,6 +85,7 @@ export class UpdateUserDto {
   avatar?: string;
 
   @ApiPropertyOptional({
+    example: true,
     description: 'Trạng thái hoạt động của user (true/false)',
   })
   @IsOptional()

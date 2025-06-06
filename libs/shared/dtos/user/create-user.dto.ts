@@ -2,10 +2,11 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsDateString, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
 import { Gender } from "src/enums/gender.enum";
 import { UserType } from "src/enums/userType.enum";
+import { REGION_LEVEL1_IDS, REGION_LEVEL1_LABELS, REGION_LEVEL2_IDS, REGION_LEVEL2_LABELS, REGION_LEVEL3_IDS, REGION_LEVEL3_LABELS } from '../department/region.constants';
 
 export class CreateUserDto {
 
-  @ApiProperty()
+  @ApiProperty({ example: 'vnaIntern' })
   @IsString()
   account: string;
 
@@ -16,29 +17,29 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Nguyễn Văn A' })
   @IsString()
   fullName: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'Kỹ sư phần mềm' })
   @IsString()
   jobTitle?: string;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'abc@gmail.com' })
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: '0909123456' })
   @IsOptional()
   @IsString()
   phone?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: '1999-05-01' })
   @IsOptional()
   @IsDateString()
   birthDay: Date;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ example: Gender.MALE, enum: Gender })
   @IsOptional()
   @IsEnum(Gender)
   gender: Gender;
@@ -64,17 +65,26 @@ export class CreateUserDto {
   @IsNumber()
   departmentId?: number;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: REGION_LEVEL1_IDS,
+    example: '79'
+  })
   @IsOptional()
   @IsString()
   city?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: REGION_LEVEL2_IDS,
+    example: '760'
+  })
   @IsOptional()
   @IsString()
   district?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({
+    enum: REGION_LEVEL3_IDS,
+    example: '26734'
+  })
   @IsOptional()
   @IsString()
   ward?: string;

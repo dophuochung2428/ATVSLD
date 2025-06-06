@@ -56,4 +56,8 @@ export class UserDto {
     @Expose()
     @Transform(({ obj }) => obj.role?.name)
     roleName: string;
+
+    @Expose()
+    avatar: string;
+
 }

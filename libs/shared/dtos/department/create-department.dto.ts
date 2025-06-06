@@ -12,7 +12,7 @@ export class CreateDepartmentDto {
   @ApiProperty()
   @IsString()
   name: string;
-  
+
   @ApiProperty()
   @IsString()
   tax_code?: string;
@@ -33,19 +33,24 @@ export class CreateDepartmentDto {
   @IsDateString()
   registration_date: Date;
 
-  @ApiProperty({ enum: REGION_LEVEL1_IDS,
-  description: `Chọn tỉnh/thành phố. Các giá trị hợp lệ:\n${REGION_LEVEL1_LABELS.join('\n')}`
- })
+  @ApiProperty({
+    enum: REGION_LEVEL1_IDS,
+    example: '79'
+  })
   @IsString()
   region_level1_id: string; // Thay cho city
 
-  @ApiProperty({ enum: REGION_LEVEL2_IDS,
-  description: `Chọn quận/huyện. Các giá trị hợp lệ:\n${REGION_LEVEL2_LABELS.join('\n')}` })
+  @ApiProperty({
+    enum: REGION_LEVEL2_IDS,
+    example: '760'
+  })
   @IsString()
   region_level2_id: string; // Thay cho district
 
-  @ApiProperty({ enum: REGION_LEVEL3_IDS,
-  description: `Chọn phường/xã. Các giá trị hợp lệ:\n${REGION_LEVEL3_LABELS.join('\n')}` })
+  @ApiProperty({
+    enum: REGION_LEVEL3_IDS,
+    example: '26734'
+  })
   @IsString()
   region_level3_id: string; // Thay cho ward
 
@@ -64,20 +69,26 @@ export class CreateDepartmentDto {
   @IsString()
   phone?: string;
 
-  @ApiProperty({ enum: REGION_LEVEL1_IDS, required: false,
-  description: `Chọn tỉnh/thành phố. Các giá trị hợp lệ:\n${REGION_LEVEL1_LABELS.join('\n')}` })
+  @ApiProperty({
+    enum: REGION_LEVEL1_IDS, required: false,
+    example: '79'
+  })
   @IsOptional()
   @IsString()
   operation_region_level1_id?: string;
 
-  @ApiProperty({ enum: REGION_LEVEL2_IDS, required: false,
-  description: `Chọn quận/huyện. Các giá trị hợp lệ:\n${REGION_LEVEL2_LABELS.join('\n')}` })
+  @ApiProperty({
+    enum: REGION_LEVEL2_IDS, required: false,
+    example: '760'
+  })
   @IsOptional()
   @IsString()
   operation_region_level2_id?: string;
 
-  @ApiProperty({ enum: REGION_LEVEL3_IDS, required: false,
-  description: `Chọn phường/xã. Các giá trị hợp lệ:\n${REGION_LEVEL3_LABELS.join('\n')}` })
+  @ApiProperty({
+    enum: REGION_LEVEL3_IDS, required: false,
+    example: '26734'
+  })
   @IsOptional()
   @IsString()
   operation_region_level3_id?: string;
