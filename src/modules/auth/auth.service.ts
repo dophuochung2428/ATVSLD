@@ -23,6 +23,9 @@ export class AuthService implements IAuthService {
     if (!user) {
       throw new UnauthorizedException('Tài khoản hoặc mật khẩu không đúng. Xin vui lòng thử lại');
     }
+    if (!user.status) {
+      throw new UnauthorizedException('Tài khoản của bạn đang bị khóa.');
+    }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
@@ -68,7 +71,7 @@ export class AuthService implements IAuthService {
   }
 
   private generateRandomPassword(): string {
-    return Math.random().toString(36).slice(-8); 
+    return Math.random().toString(36).slice(-8);
   }
 
   async resetPassword(token: string, newPassword: string) {

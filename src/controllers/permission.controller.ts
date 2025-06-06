@@ -4,8 +4,8 @@ import { JwtAuthGuard } from "src/modules/auth/jwt.guard";
 import { IPermissionService } from "src/services/permission/permission.service.interface";
 
 @ApiTags('Permission')
-// @ApiBearerAuth('JWT-auth')
-// @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
 @Controller('permissions')
 export class PermissionController {
   constructor(
@@ -23,11 +23,13 @@ export class PermissionController {
 
     const result = groups.map((group, groupIndex) => ({
       stt: romanNumerals[groupIndex] || (groupIndex + 1).toString(),
+      id: group.id,
       code: group.code,
       name: group.name,
       type: group.type,
       children: group.children?.map((child, childIndex) => ({
         stt: (childIndex + 1).toString(),
+        id: child.id,
         code: child.code,
         name: child.name,
         type: child.type,

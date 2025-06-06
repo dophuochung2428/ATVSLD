@@ -88,11 +88,22 @@ export class UserService implements IUserService {
     });
   }
 
-  /////////////////////
   async updatePassword(userId: number, hashedPassword: string): Promise<void> {
     await this.userRepository.update(userId, { password: hashedPassword });
   }
 
+  async resetPassword(userId: number): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const defaultPassword = 'Abcd1@34';
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    user.password = hashedPassword;
+    await this.userRepository.save(user);
+  }
 
   async create(dto: CreateUserDto): Promise<User> {
     const { departmentId, roleId, userType, ...rest } = dto;
@@ -176,5 +187,14 @@ export class UserService implements IUserService {
     await this.userRepository.remove(users);
   }
 
+  async toggleStatus(id: number): Promise<void> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`Không tìm thấy User với id:  ${id} `);
+    }
 
+    user.status = !user.status;
+
+    await this.userRepository.save(user);
+  }
 }

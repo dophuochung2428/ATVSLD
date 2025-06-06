@@ -1,7 +1,7 @@
-import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
 import { IUserService } from 'src/services/user/user.service.interface';
 import { plainToInstance } from 'class-transformer';
 import { UserDto } from '@shared/dtos/user/user.dto';
@@ -73,6 +73,12 @@ export class UserController {
     return plainToInstance(UserDto, updated, { excludeExtraneousValues: true });
   }
 
+  @Put(':id/reset-password')
+  @ApiOperation({ summary: 'Reset mật khẩu về mặc định: Abcd1@34' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID của user cần đổi mk' })
+  async resetPassword(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.userService.resetPassword(id);
+  }
 
   @Delete()
   @ApiOperation({ summary: 'Delete one or many users by ID(s)' })
@@ -91,6 +97,16 @@ export class UserController {
   })
   async deleteUsers(@Body('ids') ids: number[]): Promise<void> {
     await this.userService.deleteMany(ids);
+  }
+
+  @Patch(':id/status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Toggle trạng thái (active/inactive) của user' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID của user cần đổi trạng thái' })
+  async toggleUserStatus(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    await this.userService.toggleStatus(id);
   }
 
 }

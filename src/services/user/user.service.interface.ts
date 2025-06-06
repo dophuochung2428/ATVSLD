@@ -14,4 +14,6 @@ export interface IUserService {
   create(dto: CreateUserDto): Promise<User>
   update(id: number, dto: UpdateUserDto): Promise<User>
   deleteMany(ids: number[]): Promise<void>
+  toggleStatus(id: number): Promise<void> 
+  resetPassword(userId: number): Promise<void>
 }
