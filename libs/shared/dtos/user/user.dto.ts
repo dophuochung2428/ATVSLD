@@ -1,6 +1,6 @@
 import { Expose, Transform } from 'class-transformer';
 import { UserType, UserTypeLabel } from 'src/enums/userType.enum';
-import { Gender } from 'src/enums/gender.enum';
+import { Gender, GenderLabel } from 'src/enums/gender.enum';
 
 export class UserDto {
     @Expose()
@@ -29,6 +29,10 @@ export class UserDto {
 
     @Expose()
     gender: Gender;
+
+    @Expose()
+    @Transform(({ obj }) => GenderLabel[obj.gender])
+    genderLabel: string;
 
     @Expose()
     userType: UserType;

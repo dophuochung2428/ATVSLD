@@ -93,6 +93,7 @@ export class UserController {
   }
 
   @Put(':id/reset-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Reset mật khẩu về mặc định: Abcd1@34' })
   @ApiParam({ name: 'id', type: Number, description: 'ID của user cần đổi mk' })
   async resetPassword(@Param('id', ParseIntPipe) id: number): Promise<void> {

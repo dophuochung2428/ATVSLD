@@ -44,10 +44,7 @@ export class CreateUserDto {
   @IsEnum(Gender)
   gender: Gender;
 
-  @ApiProperty({
-    example: 'BUSINESS',
-    description: 'ADMIN hoặc BUSINESS',
-  })
+  @ApiProperty({ example: UserType.BUSINESS, enum: UserType })
   @IsEnum(UserType)
   userType: UserType;
 

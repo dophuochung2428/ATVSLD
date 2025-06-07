@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
 import { IUserService } from './user.service.interface';
 import { CreateUserDto } from '@shared/dtos/user/create-user.dto';
@@ -13,6 +13,8 @@ import { IRoleService } from '../role/role.service.interface';
 import { UserDto } from '@shared/dtos/user/user.dto';
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
+import { GenderLabel } from 'src/enums/gender.enum';
+import { RegionService } from '../region/region.service';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -25,17 +27,42 @@ export class UserService implements IUserService {
     private departmentRepository: Repository<Department>,
     @Inject('IRoleService')
     private readonly roleService: IRoleService,
+    private readonly regionService: RegionService,
+    private readonly dataSource: DataSource,
   ) { }
 
+  private async getRegionNames(regionLevel1Id?: string, regionLevel2Id?: string, regionLevel3Id?: string) {
+    if (!regionLevel1Id) return { city: null, district: null, ward: null };
+    const city = await this.regionService.getLevel1Name(regionLevel1Id);
+    const district = regionLevel2Id ? await this.regionService.getLevel2Name(regionLevel1Id, regionLevel2Id) : null;
+    const ward = regionLevel2Id && regionLevel3Id ? await this.regionService.getLevel3Name(regionLevel1Id, regionLevel2Id, regionLevel3Id) : null;
+    return { city, district, ward };
+  }
   async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    const users = await this.userRepository.find();
+    await Promise.all(users.map(async user => {
+      const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+      user.city = city;
+      user.district = district;
+      user.ward = ward;
+    }));
+    return users;
   }
 
   async findUserById(id: number): Promise<User | null> {
-    return this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { id },
       relations: ['role', 'department'],
     });
+    if (!user) return null;
+
+    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+    user.city = city;
+    user.district = district;
+    user.ward = ward;
+
+    delete user.password;
+    return user;
   }
 
 
@@ -46,6 +73,10 @@ export class UserService implements IUserService {
     });
     if (user) {
       delete user.password;
+      const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+      user.city = city;
+      user.district = district;
+      user.ward = ward;
     }
     return user;
   }
@@ -73,12 +104,20 @@ export class UserService implements IUserService {
   async findByAccount(account: string): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { account }, relations: ['role', 'department'] });
     if (!user) throw new NotFoundException(`User with account ${account} not found`);
+    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+    user.city = city;
+    user.district = district;
+    user.ward = ward;
     return user;
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { email }, relations: ['role', 'department'] });
     if (!user) throw new NotFoundException(`User with email ${email} not found`);
+    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+    user.city = city;
+    user.district = district;
+    user.ward = ward;
     return user;
   }
 
@@ -217,7 +256,7 @@ export class UserService implements IUserService {
       { header: 'Job Title', key: 'jobTitle', width: 20 },
       { header: 'Address', key: 'address', width: 40 },
       { header: 'Birth Day', key: 'birthDay', width: 15 },
-      { header: 'Gender', key: 'gender', width: 10 },
+      { header: 'Gender', key: 'genderLabel', width: 10 },
       { header: 'User Type', key: 'userTypeLabel', width: 15 },
       { header: 'Status', key: 'status', width: 10 },
       { header: 'City', key: 'city', width: 15 },
@@ -228,35 +267,40 @@ export class UserService implements IUserService {
       { header: 'Avatar URL', key: 'avatar', width: 40 },
     ];
 
-    // Thêm dữ liệu user
-    users.forEach(user => {
-      worksheet.addRow({
-        id: user.id,
-        account: user.account,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-        jobTitle: user.jobTitle,
-        address: user.address,
-        birthDay: user.birthDay ? new Date(user.birthDay).toLocaleDateString('vi-VN') : '',
-        gender: user.gender,
-        userTypeLabel: UserTypeLabel[user.userType],
-        status: user.status ? 'Active' : 'Inactive',
-        city: user.city,
-        district: user.district,
-        ward: user.ward,
-        departmentName: user.department?.name,
-        roleName: user.role?.name,
-        avatar: user.avatar,
+    for (const user of users) {
+      const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+
+
+      // Thêm dữ liệu user
+      users.forEach(user => {
+        worksheet.addRow({
+          id: user.id,
+          account: user.account,
+          fullName: user.fullName,
+          email: user.email,
+          phone: user.phone,
+          jobTitle: user.jobTitle,
+          address: user.address,
+          birthDay: user.birthDay ? new Date(user.birthDay).toLocaleDateString('vi-VN') : '',
+          genderLabel: GenderLabel[user.gender],
+          userTypeLabel: UserTypeLabel[user.userType],
+          status: user.status ? 'Active' : 'Inactive',
+          city,
+          district,
+          ward,
+          departmentName: user.department?.name,
+          roleName: user.role?.name,
+          avatar: user.avatar,
+        });
       });
-    });
+    }
 
-    // Gửi file về client
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
+      // Gửi file về client
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
 
-    await workbook.xlsx.write(res);
-    res.end();
+      await workbook.xlsx.write(res);
+      res.end();
+    }
+
   }
-
-}
