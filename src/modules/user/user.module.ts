@@ -7,11 +7,13 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { Role } from 'src/entities/role.entity';
 import { Department } from 'src/entities/department.entity';
 import { RoleModule } from '../role/role.module';
+import { RegionModule } from '../region/region.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Role, Department]),
     CloudinaryModule,
-    RoleModule
+    RoleModule,
+    RegionModule
   ],
   controllers: [UserController],
   providers: [
