@@ -154,6 +154,19 @@ export class UserController {
 
   @Post('import-excel')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'Excel file để import user',
+        },
+      },
+    },
+  })
   async importUsersFromExcel(@UploadedFile() file: Express.Multer.File) {
     if (!file || !file.buffer) {
       throw new HttpException('File không hợp lệ hoặc thiếu file Excel.', HttpStatus.BAD_REQUEST);

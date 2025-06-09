@@ -354,6 +354,25 @@ export class UserService implements IUserService {
         if (!gender) throw new Error(`Giới tính không hợp lệ: ${row.getCell(9).text.trim()}`);
         if (!userType) throw new Error(`Loại người dùng không hợp lệ: ${row.getCell(10).text.trim()}`);
 
+        // Lấy tên department và role từ Excel
+        const departmentName = row.getCell(11).text.trim();
+        const roleName = row.getCell(12).text.trim();
+
+        let departmentId: string | null = null;
+        let roleId: string | null = null;
+
+        if (userType === UserType.BUSINESS) {
+          // Tìm department theo tên
+          const department = await this.departmentRepository.findOne({ where: { name: departmentName } });
+          if (!department) throw new Error(`Không tìm thấy phòng ban/doanh nghiệp: ${departmentName}`);
+          departmentId = department.id;
+        } else if (userType === UserType.ADMIN) {
+          // Tìm role theo tên
+          const role = await this.roleRepository.findOne({ where: { name: roleName } });
+          if (!role) throw new Error(`Không tìm thấy vai trò: ${roleName}`);
+          roleId = role.id;
+        }
+
         const dto: CreateUserDto = {
           account: row.getCell(1).text.trim(),
           password: row.getCell(2).text.trim(),
@@ -365,8 +384,8 @@ export class UserService implements IUserService {
           birthDay: row.getCell(8).text.trim() ? new Date(row.getCell(8).text.trim()) : null,
           gender,
           userType,
-          departmentId: row.getCell(11).text.trim() || null,
-          roleId: row.getCell(12).text.trim() || null,
+          departmentId,
+          roleId,
         };
 
         const createdUser = await this.create(dto);
@@ -378,6 +397,7 @@ export class UserService implements IUserService {
 
     return { createdUsers, errors };
   }
+
 
 
 
