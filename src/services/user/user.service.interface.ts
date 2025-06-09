@@ -15,8 +15,9 @@ export interface IUserService {
   create(dto: CreateUserDto): Promise<User>
   update(id: string, dto: UpdateUserDto): Promise<User>
   deleteMany(ids: string[]): Promise<void>
-  toggleStatus(id: string): Promise<void> 
+  toggleStatus(id: string): Promise<void>
   resetPassword(userId: string): Promise<void>
-  exportUsersToExcel(ids: string[], res: Response): Promise<void> 
+  exportUsersToExcel(ids: string[], res: Response): Promise<void>
   createUsersFromExcel(buffer: Buffer): Promise<{ createdUsers: User[]; errors: string[] }>
+  findByAccountWithPassword(account: string): Promise<User | null>
 }

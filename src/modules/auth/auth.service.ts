@@ -19,7 +19,7 @@ export class AuthService implements IAuthService {
   ) { }
 
   async validateUser(username: string, password: string): Promise<User | null> {
-    const user = await this.userService.findByAccount(username);
+    const user = await this.userService.findByAccountWithPassword(username);
     if (!user) {
       throw new UnauthorizedException('Tài khoản hoặc mật khẩu không đúng. Xin vui lòng thử lại');
     }

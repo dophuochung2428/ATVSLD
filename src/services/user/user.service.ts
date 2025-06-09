@@ -111,6 +111,15 @@ export class UserService implements IUserService {
     return await this.mapUserDetail(user);
   }
 
+  async findByAccountWithPassword(account: string): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { account },
+      relations: ['role', 'department'],
+    });
+    if (!user) throw new NotFoundException(`User with account ${account} not found`);
+    return user;
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { email },
