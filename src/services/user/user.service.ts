@@ -151,6 +151,17 @@ export class UserService implements IUserService {
     user.password = await bcrypt.hash(rest.password, 10);
     user.userType = userType;
 
+    const usernameExists = await this.userRepository.findOne({ where: { account: rest.account } });
+    if (usernameExists) {
+      throw new BadRequestException('Username already exists');
+    }
+
+    const emailExists = await this.userRepository.findOne({ where: { email: rest.email } });
+    if (emailExists) {
+      throw new BadRequestException('Email already exists');
+    }
+
+
     if (userType === UserType.BUSINESS) {
       if (!departmentId) {
         throw new BadRequestException('Department is required for Business user');
@@ -272,35 +283,33 @@ export class UserService implements IUserService {
 
 
       // Thêm dữ liệu user
-      users.forEach(user => {
-        worksheet.addRow({
-          id: user.id,
-          account: user.account,
-          fullName: user.fullName,
-          email: user.email,
-          phone: user.phone,
-          jobTitle: user.jobTitle,
-          address: user.address,
-          birthDay: user.birthDay ? new Date(user.birthDay).toLocaleDateString('vi-VN') : '',
-          genderLabel: GenderLabel[user.gender],
-          userTypeLabel: UserTypeLabel[user.userType],
-          status: user.status ? 'Active' : 'Inactive',
-          city,
-          district,
-          ward,
-          departmentName: user.department?.name,
-          roleName: user.role?.name,
-          avatar: user.avatar,
-        });
+      worksheet.addRow({
+        id: user.id,
+        account: user.account,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        jobTitle: user.jobTitle,
+        address: user.address,
+        birthDay: user.birthDay ? new Date(user.birthDay).toLocaleDateString('vi-VN') : '',
+        genderLabel: GenderLabel[user.gender],
+        userTypeLabel: UserTypeLabel[user.userType],
+        status: user.status ? 'Active' : 'Inactive',
+        city,
+        district,
+        ward,
+        departmentName: user.department?.name,
+        roleName: user.role?.name,
+        avatar: user.avatar,
       });
     }
 
-      // Gửi file về client
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
+    // Gửi file về client
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
 
-      await workbook.xlsx.write(res);
-      res.end();
-    }
-
+    await workbook.xlsx.write(res);
+    res.end();
   }
+
+}
