@@ -30,4 +30,5 @@ export interface IDepartmentService {
   exportToExcel(ids: number[], res: Response): Promise<void>
   checkTaxCode(tax_code: string): Promise<{ isAvailable: boolean; message: string }>
   importFromExcel(file: Express.Multer.File)
+  getActiveDepartments(): Promise<Department[]>
 }

@@ -153,28 +153,28 @@ export class UserService implements IUserService {
 
     const usernameExists = await this.userRepository.findOne({ where: { account: rest.account } });
     if (usernameExists) {
-      throw new BadRequestException('Username already exists');
+      throw new BadRequestException('Tên tài khoản đã tồn tại');
     }
 
     const emailExists = await this.userRepository.findOne({ where: { email: rest.email } });
     if (emailExists) {
-      throw new BadRequestException('Email already exists');
+      throw new BadRequestException('Email đã tồn tại');
     }
 
 
     if (userType === UserType.BUSINESS) {
       if (!departmentId) {
-        throw new BadRequestException('Department is required for Business user');
+        throw new BadRequestException('Loại tài khoản này cần cung cấp thông tin doanh nghiệp');
       }
       if (roleId) {
-        throw new BadRequestException('Business user should not have a roleId');
+        throw new BadRequestException('Loại tài khoản này không cần thông tin role');
       }
       const department = await this.departmentRepository.findOneBy({ id: departmentId });
-      if (!department) throw new NotFoundException('Department not found');
+      if (!department || !department.status) throw new NotFoundException('Doanh nghiệp đang ngưng hoạt động');
       user.department = department;
 
       const role = await this.roleService.getByCode("USER");
-      if (!role) throw new NotFoundException('Role for Business  User not found');
+      if (!role) throw new NotFoundException('Không tìm thấy quyền yêu cầu');
       user.role = role;
 
       if (department.headEmail) {
@@ -183,18 +183,18 @@ export class UserService implements IUserService {
     }
     else if (userType === UserType.ADMIN) {
       if (!roleId) {
-        throw new BadRequestException('Role is required for Admin user');
+        throw new BadRequestException('Loại tài khoản này cần phân quyền');
       }
       if (departmentId) {
-        throw new BadRequestException('Admin user should not have a departmentId');
+        throw new BadRequestException('Loại tài khoản này không cần thông tin doanh nghiệp');
       }
       const role = await this.roleRepository.findOneBy({ id: roleId });
-      if (!role) throw new NotFoundException('Role not found');
+      if (!role) throw new NotFoundException('Không tìm thấy quyền cần thiết lập');
       user.role = role;
       user.department = null;
     }
     else {
-      throw new BadRequestException('Invalid userType');
+      throw new BadRequestException('Loại tài khoản không hợp lệ');
     }
     return this.userRepository.save(user);
   }
@@ -205,24 +205,29 @@ export class UserService implements IUserService {
       where: { id },
       relations: ['role', 'department'],
     });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException('Không tìm thấy user');
 
     if (user.userType === UserType.ADMIN) {
       if (dto.departmentId && dto.departmentId !== user.department?.id) {
-        throw new BadRequestException('Admin user cannot update department');
+        throw new BadRequestException('Tài khoản quản trị không cần thông tin doanh nghiệp');
       }
       if (dto.roleId && dto.roleId !== user.role?.id) {
         const role = await this.roleRepository.findOneBy({ id: dto.roleId });
-        if (!role) throw new NotFoundException('Role not found');
+        if (!role) throw new NotFoundException('Không tìm thấy quyền cần thiết');
         user.role = role;
       }
     } else if (user.userType === UserType.BUSINESS) {
       if (dto.roleId && dto.roleId !== user.role?.id) {
-        throw new BadRequestException('Business user cannot update role');
+        throw new BadRequestException('Tài khoản doanh nghiệp không thể có thông tin quyền');
       }
       if (dto.departmentId && dto.departmentId !== user.department?.id) {
         const department = await this.departmentRepository.findOneBy({ id: dto.departmentId });
-        if (!department) throw new NotFoundException('Department not found');
+
+        if (!department) throw new NotFoundException('không tìm thấy doanh nghiệp');
+
+        if (!department.status) {
+          throw new BadRequestException('Không thể chuyển sang doanh nghiệp đang ngưng hoạt động');
+        }
         user.department = department;
       }
     }
@@ -239,9 +244,20 @@ export class UserService implements IUserService {
   }
 
   async toggleStatus(id: number): Promise<void> {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['department'],
+    });
     if (!user) {
       throw new NotFoundException(`Không tìm thấy User với id:  ${id} `);
+    }
+
+    if (!user.status) {
+      if (user.department || !user.department.status) {
+        throw new BadRequestException(
+          'Không thể bật user vì doanh nghiệp chưa được kích hoạt.',
+        );
+      }
     }
 
     user.status = !user.status;

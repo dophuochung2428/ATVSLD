@@ -95,6 +95,13 @@ export class DepartmentService implements IDepartmentService {
     };
   }
 
+  async getActiveDepartments(): Promise<Department[]> {
+    return this.departmentRepository.find({
+      where: { status: true },
+      order: { name: 'ASC' },
+    });
+  }
+
   async findById(id: number): Promise<Department> {
     const department = await this.departmentRepository.findOne({
       where: { id },
@@ -192,12 +199,18 @@ export class DepartmentService implements IDepartmentService {
     }
 
     department.status = !department.status;
-
     await this.departmentRepository.save(department);
-    await this.userRepository.update(
-      { department: { id } }, // điều kiện: user.department.id = id
-      { status: department.status }
-    );
+
+    // await this.userRepository.update(
+    //   { department: { id } }, // điều kiện: user.department.id = id
+    //   { status: department.status }
+    // );
+    if (!department.status) {
+      await this.userRepository.update(
+        { department: { id } },
+        { status: false }
+      );
+    }
   }
   //Hàm xóa file lưu ở cloudinary theo publicId
   private async deleteCloudinaryFile(public_id: string) {

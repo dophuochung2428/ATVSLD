@@ -18,7 +18,7 @@ import { Permissions } from 'src/modules/auth/permissions.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { PermissionsGuard } from 'src/modules/auth/permissions.guard';
 
-@ApiTags('Department')
+@ApiTags('Business')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard)
 @Controller('departments')
@@ -36,6 +36,12 @@ export class DepartmentController {
   @ApiOperation({ summary: 'Get Department List( có phân trang)' })
   async getAllDepartMents(@Query() query: PaginationQueryDto) {
     return this.departmentService.findAll(query);
+  }
+
+  @Get('active')
+  @ApiOperation({ summary: 'Lấy danh sách doanh nghiệp đang hoạt động' })
+  async getActiveDepartments() {
+    return this.departmentService.getActiveDepartments();
   }
 
   @Permissions('ADMIN_C_DEPARTMENT_CREATE')
