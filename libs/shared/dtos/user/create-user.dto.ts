@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsDateString, IsEmail, IsEnum, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsEnum, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 import { Gender } from "src/enums/gender.enum";
 import { UserType } from "src/enums/userType.enum";
 import { REGION_LEVEL1_IDS, REGION_LEVEL1_LABELS, REGION_LEVEL2_IDS, REGION_LEVEL2_LABELS, REGION_LEVEL3_IDS, REGION_LEVEL3_LABELS } from '../department/region.constants';
@@ -52,7 +52,7 @@ export class CreateUserDto {
     description: 'chỉ truyền vào nếu userType là admin',
   })
   @IsOptional()
-  @IsString()
+  @IsUUID()
   roleId: string;
 
   @ApiPropertyOptional({
