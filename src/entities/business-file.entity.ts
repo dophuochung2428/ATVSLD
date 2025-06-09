@@ -3,8 +3,8 @@ import { Department } from './department.entity';
 
 @Entity()
 export class BusinessFile {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string; // Ví dụ: "Giấy phép kinh doanh"

@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus, Res, BadRequestException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus, Res, BadRequestException, ParseUUIDPipe } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -41,7 +41,7 @@ export class UserController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get User By ID' })
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
+  async getUserById(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
     const user = await this.userService.findById(id);
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
@@ -79,7 +79,7 @@ export class UserController {
   @ApiOperation({ summary: 'Update user' })
   @ApiBody({ type: UpdateUserDto })
   async updateUser(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @UploadedFile() avatarFile: Express.Multer.File,
     @Body() dto: UpdateUserDto
   ): Promise<UserDto> {
@@ -96,7 +96,7 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Reset mật khẩu về mặc định: Abcd1@34' })
   @ApiParam({ name: 'id', type: Number, description: 'ID của user cần đổi mk' })
-  async resetPassword(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async resetPassword(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.userService.resetPassword(id);
   }
 
@@ -115,16 +115,16 @@ export class UserController {
       required: ['ids']
     }
   })
-  async deleteUsers(@Body('ids') ids: number[]): Promise<void> {
+  async deleteUsers(@Body('ids') ids: string[]): Promise<void> {
     await this.userService.deleteMany(ids);
   }
 
   @Patch(':id/status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Toggle trạng thái (active/inactive) của user' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID của user cần đổi trạng thái' })
+  @ApiParam({ name: 'id', type: String, description: 'ID của user cần đổi trạng thái' })
   async toggleUserStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<void> {
     await this.userService.toggleStatus(id);
   }
@@ -144,7 +144,7 @@ export class UserController {
         required: ['ids'],
       }
     })
-    async exportExcel(@Body() body: { ids: number[] }, @Res() res: Response): Promise<void> {
+    async exportExcel(@Body() body: { ids: string[] }, @Res() res: Response): Promise<void> {
       if (!body.ids || body.ids.length === 0) {
         throw new BadRequestException('Vui lòng chọn ít nhất một user để xuất Excel.');
       }

@@ -3,6 +3,7 @@ import { IsDateString, IsEmail, IsEnum, IsNumber, IsOptional, IsString, IsUUID }
 import { Gender } from "src/enums/gender.enum";
 import { UserType } from "src/enums/userType.enum";
 import { REGION_LEVEL1_IDS, REGION_LEVEL1_LABELS, REGION_LEVEL2_IDS, REGION_LEVEL2_LABELS, REGION_LEVEL3_IDS, REGION_LEVEL3_LABELS } from '../department/region.constants';
+import { Transform } from "class-transformer";
 
 export class CreateUserDto {
 
@@ -37,6 +38,7 @@ export class CreateUserDto {
   @ApiPropertyOptional({ example: '1999-05-01' })
   @IsOptional()
   @IsDateString()
+  @Transform(({ value }) => value === '' ? undefined : value)
   birthDay: Date;
 
   @ApiPropertyOptional({ example: Gender.MALE, enum: Gender })
@@ -59,8 +61,8 @@ export class CreateUserDto {
     description: 'chỉ truyền vào nếu userType là business',
   })
   @IsOptional()
-  @IsNumber()
-  departmentId?: number;
+  @IsString()
+  departmentId?: string;
 
   @ApiPropertyOptional({
     enum: REGION_LEVEL1_IDS,

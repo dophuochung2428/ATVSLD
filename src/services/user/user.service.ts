@@ -49,7 +49,7 @@ export class UserService implements IUserService {
     return users;
   }
 
-  async findUserById(id: number): Promise<User | null> {
+  async findUserById(id: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['role', 'department'],
@@ -66,7 +66,7 @@ export class UserService implements IUserService {
   }
 
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission'],
@@ -81,7 +81,7 @@ export class UserService implements IUserService {
     return user;
   }
 
-  async findPermissionWithRoleId(id: number): Promise<User | null> {
+  async findPermissionWithRoleId(id: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { id, status: true },
       relations: {
@@ -128,11 +128,11 @@ export class UserService implements IUserService {
     });
   }
 
-  async updatePassword(userId: number, hashedPassword: string): Promise<void> {
+  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
     await this.userRepository.update(userId, { password: hashedPassword });
   }
 
-  async resetPassword(userId: number): Promise<void> {
+  async resetPassword(userId: string): Promise<void> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -200,7 +200,7 @@ export class UserService implements IUserService {
   }
 
 
-  async update(id: number, dto: UpdateUserDto): Promise<User> {
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['role', 'department'],
@@ -236,14 +236,14 @@ export class UserService implements IUserService {
     return this.userRepository.save(user);
   }
 
-  async deleteMany(ids: number[]): Promise<void> {
+  async deleteMany(ids: string[]): Promise<void> {
     const users = await this.userRepository.findBy({ id: In(ids) });
     if (!users.length) throw new NotFoundException('No users found to delete');
 
     await this.userRepository.remove(users);
   }
 
-  async toggleStatus(id: number): Promise<void> {
+  async toggleStatus(id: string): Promise<void> {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['department'],
@@ -265,7 +265,7 @@ export class UserService implements IUserService {
     await this.userRepository.save(user);
   }
 
-  async exportUsersToExcel(ids: number[], res: Response): Promise<void> {
+  async exportUsersToExcel(ids: string[], res: Response): Promise<void> {
     const users = await this.userRepository.find({
       where: { id: In(ids) },
       relations: ['department', 'role']

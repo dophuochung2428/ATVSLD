@@ -28,7 +28,7 @@ export class PermissionService implements IPermissionService{
     });
   }
 
-  async getPermissions(userId: number): Promise<string[]> {
+  async getPermissions(userId: string): Promise<string[]> {
   const user = await this.userRepository.findOne({
     where: { id: userId },
     relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission'],

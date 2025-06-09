@@ -74,25 +74,25 @@ export class AuthService implements IAuthService {
     return Math.random().toString(36).slice(-8);
   }
 
-  async resetPassword(token: string, newPassword: string) {
-    let payload: ResetPasswordPayload;
-    try {
-      payload = await this.jwtService.verifyAsync<ResetPasswordPayload>(token, {
-        secret: process.env.JWT_SECRET,
-      });
-    } catch (err) {
-      throw new BadRequestException('Token không hợp lệ hoặc đã hết hạn');
-    }
+  // async resetPassword(token: string, newPassword: string) {
+  //   let payload: ResetPasswordPayload;
+  //   try {
+  //     payload = await this.jwtService.verifyAsync<ResetPasswordPayload>(token, {
+  //       secret: process.env.JWT_SECRET,
+  //     });
+  //   } catch (err) {
+  //     throw new BadRequestException('Token không hợp lệ hoặc đã hết hạn');
+  //   }
 
-    const user = await this.userService.findById(payload.sub);
-    if (!user) {
-      throw new NotFoundException('Người dùng không tồn tại');
-    }
+  //   const user = await this.userService.findById(payload.sub);
+  //   if (!user) {
+  //     throw new NotFoundException('Người dùng không tồn tại');
+  //   }
 
-    const updatePassword = await bcrypt.hash(newPassword, 10);
-    await this.userService.updatePassword(user.id, updatePassword);
+  //   const updatePassword = await bcrypt.hash(newPassword, 10);
+  //   await this.userService.updatePassword(user.id, updatePassword);
 
-    return { message: 'Mật khẩu đã được cập nhật thành công' };
-  }
+  //   return { message: 'Mật khẩu đã được cập nhật thành công' };
+  // }
 
 }

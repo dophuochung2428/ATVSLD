@@ -4,7 +4,7 @@ import { Gender, GenderLabel } from 'src/enums/gender.enum';
 
 export class UserDto {
     @Expose()
-    id: number;
+    id: string;
 
     @Expose()
     account: string;

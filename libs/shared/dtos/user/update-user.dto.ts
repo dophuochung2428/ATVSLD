@@ -5,9 +5,11 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 import { Gender } from 'src/enums/gender.enum';
 import { REGION_LEVEL1_IDS, REGION_LEVEL1_LABELS, REGION_LEVEL2_IDS, REGION_LEVEL2_LABELS, REGION_LEVEL3_IDS, REGION_LEVEL3_LABELS } from '../department/region.constants';
+import { Transform } from 'class-transformer';
 
 
 export class UpdateUserDto {
@@ -29,6 +31,7 @@ export class UpdateUserDto {
   @ApiPropertyOptional({ example: '1999-05-01' })
   @IsOptional()
   @IsDateString()
+  @Transform(({ value }) => value === '' ? undefined : value)
   birthDay?: Date;
 
   @ApiPropertyOptional({ example: Gender.MALE, enum: Gender })
@@ -40,8 +43,8 @@ export class UpdateUserDto {
     description: 'chỉ truyền nếu là doanh nghiệp',
   })
   @IsOptional()
-  @IsNumber()
-  departmentId?: number;
+  @IsUUID()
+  departmentId?: string;
 
   @ApiPropertyOptional({
     description: 'chỉ truyền nếu là quản trị viên',

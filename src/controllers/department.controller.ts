@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res, BadRequestException, UploadedFile } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Post, Body, Patch, HttpCode, HttpStatus, Param, ParseIntPipe, Query, UseInterceptors, UploadedFiles, Delete, Put, Res, BadRequestException, UploadedFile, ParseUUIDPipe } from '@nestjs/common';
 import { Department } from '../entities/department.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiConsumes, ApiBody } from '@nestjs/swagger';
@@ -33,7 +33,7 @@ export class DepartmentController {
   @Permissions('ADMIN_C_DEPARTMENT_VIEW')
   @UseGuards(PermissionsGuard)
   @Get()
-  @ApiOperation({ summary: 'Get Department List( có phân trang)' })
+  @ApiOperation({ summary: 'Get danh sách doanh nghiệp( có phân trang)' })
   async getAllDepartMents(@Query() query: PaginationQueryDto) {
     return this.departmentService.findAll(query);
   }
@@ -46,7 +46,7 @@ export class DepartmentController {
 
   @Permissions('ADMIN_C_DEPARTMENT_CREATE')
   @Post()
-  @ApiOperation({ summary: 'Tạo một Department mới' })
+  @ApiOperation({ summary: 'Tạo một doanh nghiệp mới' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateDepartmentWithFilesDto })
   @UseInterceptors(
@@ -67,7 +67,7 @@ export class DepartmentController {
   }
 
   @Get('mail-check-to-create')
-  @ApiOperation({ summary: 'Kiểm tra email trước khi tạo Department' })
+  @ApiOperation({ summary: 'Kiểm tra email trước khi tạo doanh nghiệp' })
   async canCreateDepartment(@Query('email') email: string) {
     try {
       const user = await this.departmentService.checkUserCanBeHead(email);
@@ -84,30 +84,30 @@ export class DepartmentController {
 
   @Patch(':id/status')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Toggle trạng thái (active/inactive) của department' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID của phòng ban cần đổi trạng thái' })
+  @ApiOperation({ summary: 'Toggle trạng thái (active/inactive) của doanh nghiệp' })
+  @ApiParam({ name: 'id', type: String, description: 'ID của doanh nghiệp cần đổi trạng thái' })
   async toggleDepartmentStatus(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<void> {
     await this.departmentService.toggleStatus(id);
   }
 
   @Permissions('ADMIN_C_DEPARTMENT_DELETE')
-  @ApiOperation({ summary: 'Xóa 1 department theo id' })
+  @ApiOperation({ summary: 'Xóa 1 doanh nghiệp theo id' })
   @Delete(':id')
-  async deleteOne(@Param('id', ParseIntPipe) id: number) {
+  async deleteOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.departmentService.deleteOne(id);
   }
 
   @Permissions('ADMIN_C_DEPARTMENT_DELETE')
-  @ApiOperation({ summary: 'Xóa nhiều department theo id' })
+  @ApiOperation({ summary: 'Xóa nhiều doanh nghiệp theo id' })
   @Delete()
   async deleteMany(@Body() body: DeleteManyDto) {
     return this.departmentService.deleteMany(body.ids);
   }
 
   @Permissions('ADMIN_C_DEPARTMENT_UPDATE')
-  @ApiOperation({ summary: 'Cập nhật department theo id' })
+  @ApiOperation({ summary: 'Cập nhật doanh nghiệp theo id' })
   @Put(':id')
   @UseInterceptors(FileFieldsInterceptor([
     { name: 'business_license', maxCount: 1 },
@@ -115,7 +115,7 @@ export class DepartmentController {
   ]))
   @ApiConsumes('multipart/form-data')
   async updateDepartment(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateDto: UpdateDepartmentWithFilesDto,
     @UploadedFiles()
     files: {
@@ -150,7 +150,7 @@ export class DepartmentController {
       required: ['ids'],
     }
   })
-  async exportExcel(@Body() body: { ids: number[] }, @Res() res: Response): Promise<void> {
+  async exportExcel(@Body() body: { ids: string[] }, @Res() res: Response): Promise<void> {
     if (!body.ids || body.ids.length === 0) {
       throw new BadRequestException('Vui lòng chọn ít nhất một phòng ban để xuất Excel.');
     }
@@ -187,10 +187,10 @@ export class DepartmentController {
     return await this.departmentService.checkTaxCode(taxCode.trim());
   }
 
-  @ApiOperation({ summary: 'Lấy chi tiết phòng ban theo ID' })
+  @ApiOperation({ summary: 'Lấy chi tiết doanh nghiệp theo ID' })
   @ApiParam({ name: 'id', description: 'ID của phòng ban' })
   @Get(':id')
-  async getDepartmentById(@Param('id', ParseIntPipe) id: number) {
+  async getDepartmentById(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.departmentService.findById(id);
   }
 

@@ -3,13 +3,13 @@ import { BusinessType } from '../../../../src/enums/businessType.enum';
 import { BusinessFile } from 'src/entities/business-file.entity';
 
 class BusinessFileDto {
-  @Expose() id: number;
+  @Expose() id: string;
   @Expose() name: string;
   @Expose() url: string;
 }
 @Exclude()
 export class DepartmentResponseDto {
-  @Expose() id: number;
+  @Expose() id: string;
   @Expose() name: string;
   @Expose() tax_code?: string;
   @Expose() business_type?: BusinessType;

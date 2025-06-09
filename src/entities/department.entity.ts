@@ -5,8 +5,8 @@ import { BusinessFile } from './business-file.entity';
 
 @Entity()
 export class Department {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 30 })
   name: string;

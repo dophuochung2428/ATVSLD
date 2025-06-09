@@ -7,7 +7,7 @@ import { Response } from 'express';
 
 export interface IDepartmentService {
   findAll(pagination: PaginationQueryDto)
-  findById(id: number): Promise<Department | null>
+  findById(id: string): Promise<Department | null>
   checkUserCanBeHead(email: string)
   create(
     createDto: CreateDepartmentDto,
@@ -16,18 +16,18 @@ export interface IDepartmentService {
       other_document?: Express.Multer.File[],
     }
   ): Promise<Department>
-  toggleStatus(id: number): Promise<void>
-  deleteOne(id: number): Promise<void>
-  deleteMany(ids: number[]): Promise<{ deleted: number }>
+  toggleStatus(id: string): Promise<void>
+  deleteOne(id: string): Promise<void>
+  deleteMany(ids: string[]): Promise<{ deleted: number }>
   update(
-    id: number,
+    id: string,
     updateDto: UpdateDepartmentDto,
     files?: {
       business_license?: Express.Multer.File[],
       other_document?: Express.Multer.File[],
     },
   ): Promise<Department>
-  exportToExcel(ids: number[], res: Response): Promise<void>
+  exportToExcel(ids: string[], res: Response): Promise<void>
   checkTaxCode(tax_code: string): Promise<{ isAvailable: boolean; message: string }>
   importFromExcel(file: Express.Multer.File)
   getActiveDepartments(): Promise<Department[]>

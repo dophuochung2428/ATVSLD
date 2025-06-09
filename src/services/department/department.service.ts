@@ -102,7 +102,7 @@ export class DepartmentService implements IDepartmentService {
     });
   }
 
-  async findById(id: number): Promise<Department> {
+  async findById(id: string): Promise<Department> {
     const department = await this.departmentRepository.findOne({
       where: { id },
       relations: ['businessFiles'],
@@ -192,7 +192,7 @@ export class DepartmentService implements IDepartmentService {
     return savedDepartment;
   }
 
-  async toggleStatus(id: number): Promise<void> {
+  async toggleStatus(id: string): Promise<void> {
     const department = await this.departmentRepository.findOneBy({ id });
     if (!department) {
       throw new NotFoundException(`Không tìm thấy Department với id:  ${id} `);
@@ -221,7 +221,7 @@ export class DepartmentService implements IDepartmentService {
     }
   }
 
-  async deleteOne(id: number): Promise<void> {
+  async deleteOne(id: string): Promise<void> {
     const department = await this.departmentRepository.findOne({
       where: { id },
       relations: ['businessFiles'],
@@ -239,7 +239,7 @@ export class DepartmentService implements IDepartmentService {
     await this.departmentRepository.remove(department);
   }
 
-  async deleteMany(ids: number[]): Promise<{ deleted: number }> {
+  async deleteMany(ids: string[]): Promise<{ deleted: number }> {
     if (ids.length === 0) {
       throw new BadRequestException('Danh sách ID không được để trống');
     }
@@ -286,7 +286,7 @@ export class DepartmentService implements IDepartmentService {
     });
   }
 
-  async update(id: number, updateDto: UpdateDepartmentDto,
+  async update(id: string, updateDto: UpdateDepartmentDto,
     files?: {
       business_license?: Express.Multer.File[],
       other_document?: Express.Multer.File[],
@@ -367,7 +367,7 @@ export class DepartmentService implements IDepartmentService {
   }
 
   //xuất excel
-  async exportToExcel(ids: number[], res: Response): Promise<void> {
+  async exportToExcel(ids: string[], res: Response): Promise<void> {
     const departments = await this.departmentRepository.find({
       where: { id: In(ids) },
       relations: ['businessFiles'],

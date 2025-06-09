@@ -8,8 +8,8 @@ import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column({ length: 100, unique: true })
     account: string;
@@ -39,10 +39,10 @@ export class User {
     @JoinColumn({ name: 'role_id' })
     role: Role;
 
-    @Column({ type: 'date' })
+    @Column({ type: 'date' , nullable: true})
     birthDay: Date;
 
-    @Column({ type: 'enum', enum: Gender, })
+    @Column({ type: 'enum', enum: Gender, nullable: true })
     gender: Gender;
 
     // Thành phố (từ regions.json)

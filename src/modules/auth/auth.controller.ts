@@ -25,10 +25,10 @@ export class AuthController {
       return this.authService.forgotPassword(dto.email);
     }
 
-    @Post('reset-password')
-    @ApiOperation({ summary: 'Đổi mật khẩu(chưa hoàn thiện)' })
-    async resetPassword(@Body() dto: ResetPasswordDto){
-      return  this.authService.resetPassword(dto.token, dto.newPassword);
-    }
+    // @Post('reset-password')
+    // @ApiOperation({ summary: 'Đổi mật khẩu(chưa hoàn thiện)' })
+    // async resetPassword(@Body() dto: ResetPasswordDto){
+    //   return  this.authService.resetPassword(dto.token, dto.newPassword);
+    // }
 
 }

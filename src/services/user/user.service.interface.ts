@@ -5,17 +5,17 @@ import { Response } from 'express';
 
 export interface IUserService {
   findAll(): Promise<User[]>;
-  findById(id: number): Promise<User | null>;
-  findUserById(id: number): Promise<User | null>
+  findById(id: string): Promise<User | null>;
+  findUserById(id: string): Promise<User | null>
   findByAccount(account: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   findByAccountWithDepartment(account: string): Promise<User | null>;
-  findPermissionWithRoleId(id: number): Promise<User | null>
-  updatePassword(userId: number, hashedPassword: string): Promise<void>;
+  findPermissionWithRoleId(id: string): Promise<User | null>
+  updatePassword(userId: string, hashedPassword: string): Promise<void>;
   create(dto: CreateUserDto): Promise<User>
-  update(id: number, dto: UpdateUserDto): Promise<User>
-  deleteMany(ids: number[]): Promise<void>
-  toggleStatus(id: number): Promise<void> 
-  resetPassword(userId: number): Promise<void>
-  exportUsersToExcel(ids: number[], res: Response): Promise<void> 
+  update(id: string, dto: UpdateUserDto): Promise<User>
+  deleteMany(ids: string[]): Promise<void>
+  toggleStatus(id: string): Promise<void> 
+  resetPassword(userId: string): Promise<void>
+  exportUsersToExcel(ids: string[], res: Response): Promise<void> 
 }
