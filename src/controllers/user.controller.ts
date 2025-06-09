@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus, Res, BadRequestException, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus, Res, BadRequestException, ParseUUIDPipe, HttpException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -129,27 +129,42 @@ export class UserController {
     await this.userService.toggleStatus(id);
   }
 
-    @Post('export-excel')
-    @ApiOperation({ summary: 'Export danh sách User ra Excel' })
-    @ApiBody({
-      schema: {
-        type: 'object',
-        properties: {
-          ids: {
-            type: 'array',
-            items: { type: 'string' },
-            example: ['id1', 'id2']
-          },
+  @Post('export-excel')
+  @ApiOperation({ summary: 'Export danh sách User ra Excel' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: { type: 'string' },
+          example: ['id1', 'id2']
         },
-        required: ['ids'],
-      }
-    })
-    async exportExcel(@Body() body: { ids: string[] }, @Res() res: Response): Promise<void> {
-      if (!body.ids || body.ids.length === 0) {
-        throw new BadRequestException('Vui lòng chọn ít nhất một user để xuất Excel.');
-      }
-      await this.userService.exportUsersToExcel(body.ids, res);
+      },
+      required: ['ids'],
+    }
+  })
+  async exportExcel(@Body() body: { ids: string[] }, @Res() res: Response): Promise<void> {
+    if (!body.ids || body.ids.length === 0) {
+      throw new BadRequestException('Vui lòng chọn ít nhất một user để xuất Excel.');
+    }
+    await this.userService.exportUsersToExcel(body.ids, res);
+  }
+
+
+  @Post('import-excel')
+  @UseInterceptors(FileInterceptor('file'))
+  async importUsersFromExcel(@UploadedFile() file: Express.Multer.File) {
+    if (!file || !file.buffer) {
+      throw new HttpException('File không hợp lệ hoặc thiếu file Excel.', HttpStatus.BAD_REQUEST);
     }
 
+    const result = await this.userService.createUsersFromExcel(file.buffer);
+    return {
+      message: 'Import hoàn tất.',
+      createdCount: result.createdUsers.length,
+      errors: result.errors,
+    };
+  }
 
 }

@@ -13,8 +13,9 @@ import { IRoleService } from '../role/role.service.interface';
 import { UserDto } from '@shared/dtos/user/user.dto';
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
-import { GenderLabel } from 'src/enums/gender.enum';
+import { Gender, GenderLabel } from 'src/enums/gender.enum';
 import { RegionService } from '../region/region.service';
+import { parseGenderLabel, parseUserTypeLabel } from 'src/ustils/enum.ustils';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -38,15 +39,28 @@ export class UserService implements IUserService {
     const ward = regionLevel2Id && regionLevel3Id ? await this.regionService.getLevel3Name(regionLevel1Id, regionLevel2Id, regionLevel3Id) : null;
     return { city, district, ward };
   }
+  private async mapUserDetail(user: User): Promise<User> {
+    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
+    user.city = city;
+    user.district = district;
+    user.ward = ward;
+
+    // Xóa password cho an toàn
+    delete user.password;
+
+    // Thêm tên role/department tùy theo userType
+    if (user.userType === UserType.BUSINESS) {
+      (user as any).departmentName = user.department?.name || null;
+    } else if (user.userType === UserType.ADMIN) {
+      (user as any).roleName = user.role?.name || null;
+    }
+
+    return user;
+  }
+
   async findAll(): Promise<User[]> {
-    const users = await this.userRepository.find();
-    await Promise.all(users.map(async user => {
-      const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
-      user.city = city;
-      user.district = district;
-      user.ward = ward;
-    }));
-    return users;
+    const users = await this.userRepository.find({ relations: ['role', 'department'] });
+    return await Promise.all(users.map(user => this.mapUserDetail(user)));
   }
 
   async findUserById(id: string): Promise<User | null> {
@@ -55,30 +69,17 @@ export class UserService implements IUserService {
       relations: ['role', 'department'],
     });
     if (!user) return null;
-
-    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
-    user.city = city;
-    user.district = district;
-    user.ward = ward;
-
-    delete user.password;
-    return user;
+    return await this.mapUserDetail(user);
   }
 
 
   async findById(id: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission'],
+      relations: ['role', 'role.rolePermissions', 'role.rolePermissions.permission', 'department'],
     });
-    if (user) {
-      delete user.password;
-      const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
-      user.city = city;
-      user.district = district;
-      user.ward = ward;
-    }
-    return user;
+    if (!user) return null;
+    return await this.mapUserDetail(user);
   }
 
   async findPermissionWithRoleId(id: string): Promise<User | null> {
@@ -102,23 +103,21 @@ export class UserService implements IUserService {
 
 
   async findByAccount(account: string): Promise<User | null> {
-    const user = await this.userRepository.findOne({ where: { account }, relations: ['role', 'department'] });
+    const user = await this.userRepository.findOne({
+      where: { account },
+      relations: ['role', 'department'],
+    });
     if (!user) throw new NotFoundException(`User with account ${account} not found`);
-    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
-    user.city = city;
-    user.district = district;
-    user.ward = ward;
-    return user;
+    return await this.mapUserDetail(user);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const user = await this.userRepository.findOne({ where: { email }, relations: ['role', 'department'] });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['role', 'department'],
+    });
     if (!user) throw new NotFoundException(`User with email ${email} not found`);
-    const { city, district, ward } = await this.getRegionNames(user.city, user.district, user.ward);
-    user.city = city;
-    user.district = district;
-    user.ward = ward;
-    return user;
+    return await this.mapUserDetail(user);
   }
 
   async findByAccountWithDepartment(account: string): Promise<User | null> {
@@ -327,5 +326,51 @@ export class UserService implements IUserService {
     await workbook.xlsx.write(res);
     res.end();
   }
+
+  async createUsersFromExcel(buffer: Buffer): Promise<{ createdUsers: User[]; errors: string[] }> {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(buffer);
+    const worksheet = workbook.getWorksheet(1);
+
+    const createdUsers: User[] = [];
+    const errors: string[] = [];
+
+    for (let i = 2; i <= worksheet.rowCount; i++) {
+      const row = worksheet.getRow(i);
+
+      try {
+        const gender = parseGenderLabel(row.getCell(9).text.trim());
+        const userType = parseUserTypeLabel(row.getCell(10).text.trim());
+
+        if (!gender) throw new Error(`Giới tính không hợp lệ: ${row.getCell(9).text.trim()}`);
+        if (!userType) throw new Error(`Loại người dùng không hợp lệ: ${row.getCell(10).text.trim()}`);
+
+        const dto: CreateUserDto = {
+          account: row.getCell(1).text.trim(),
+          password: row.getCell(2).text.trim(),
+          fullName: row.getCell(3).text.trim(),
+          email: row.getCell(4).text.trim(),
+          phone: row.getCell(5).text.trim(),
+          jobTitle: row.getCell(6).text.trim(),
+          address: row.getCell(7).text.trim(),
+          birthDay: row.getCell(8).text.trim() ? new Date(row.getCell(8).text.trim()) : null,
+          gender,
+          userType,
+          departmentId: row.getCell(11).text.trim() || null,
+          roleId: row.getCell(12).text.trim() || null,
+        };
+
+        const createdUser = await this.create(dto);
+        createdUsers.push(createdUser);
+      } catch (error) {
+        errors.push(`Dòng ${i}: ${error.message || 'Lỗi không xác định'}`);
+      }
+    }
+
+    return { createdUsers, errors };
+  }
+
+
+
 
 }

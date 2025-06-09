@@ -18,4 +18,5 @@ export interface IUserService {
   toggleStatus(id: string): Promise<void> 
   resetPassword(userId: string): Promise<void>
   exportUsersToExcel(ids: string[], res: Response): Promise<void> 
+  createUsersFromExcel(buffer: Buffer): Promise<{ createdUsers: User[]; errors: string[] }>
 }
