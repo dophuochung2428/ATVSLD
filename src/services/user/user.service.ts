@@ -155,12 +155,6 @@ export class UserService implements IUserService {
   async create(dto: CreateUserDto): Promise<User> {
     const { password, departmentId, roleId, userType, ...rest } = dto;
 
-    const user = this.userRepository.create({
-      ...rest,
-      password: await bcrypt.hash(password, 10),
-      userType
-    });
-
     const usernameExists = await this.userRepository.findOne({ where: { account: rest.account } });
     if (usernameExists) {
       throw new BadRequestException('Tên tài khoản đã tồn tại');
@@ -171,6 +165,11 @@ export class UserService implements IUserService {
       throw new BadRequestException('Email đã tồn tại');
     }
 
+    const user = this.userRepository.create({
+      ...rest,
+      password,
+      userType
+    });
 
     if (userType === UserType.BUSINESS) {
       if (!departmentId) {
