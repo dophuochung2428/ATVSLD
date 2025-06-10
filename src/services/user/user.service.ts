@@ -261,7 +261,7 @@ export class UserService implements IUserService {
     }
 
     if (!user.status) {
-      if (user.department || !user.department.status) {
+      if (user.department && !user.department.status) {
         throw new BadRequestException(
           'Không thể bật user vì doanh nghiệp chưa được kích hoạt.',
         );
