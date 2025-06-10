@@ -10,6 +10,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ICloudinaryService } from 'src/services/cloudinary/cloudinary.service.interface';
 import { UpdateUserDto } from '@shared/dtos/user/update-user.dto';
 import { Response } from 'express';
+import { Permissions } from 'src/modules/auth/permissions.decorator';
 
 @ApiTags('User')
 @ApiBearerAuth('JWT-auth')
@@ -23,6 +24,7 @@ export class UserController {
     private readonly cloudinaryService: ICloudinaryService,
   ) { }
 
+  // @Permissions('ADMIN_C_USER_VIEW')
   @Get('by-account/:account')
   @ApiOperation({ summary: 'Get User by Account' })
   @ApiParam({ name: 'account', type: 'string', description: 'Account name (username)' })
@@ -31,6 +33,7 @@ export class UserController {
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 
+  // @Permissions('ADMIN_C_USER_VIEW')
   @Get('by-email/:email')
   @ApiOperation({ summary: 'Get User by Email' })
   @ApiParam({ name: 'email', type: 'string', description: 'Email của user' })
@@ -39,6 +42,7 @@ export class UserController {
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 
+  // @Permissions('ADMIN_C_USER_VIEW')
   @Get(':id')
   @ApiOperation({ summary: 'Get User By ID' })
   async getUserById(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
@@ -46,6 +50,7 @@ export class UserController {
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 
+  // @Permissions('ADMIN_C_USER_VIEW')
   @Get()
   @ApiOperation({ summary: 'Get User List' })
   async getAllUsers(): Promise<UserDto[]> {
@@ -53,8 +58,27 @@ export class UserController {
     return plainToInstance(UserDto, users, { excludeExtraneousValues: true });
   }
 
+  @Permissions('ADMIN_C_USER_VIEW')
+  @Get('check-account')
+  @ApiOperation({ summary: 'Kiểm tra có tài khoản trùng ko' })
+  async checkAccountExists(@Query('account') account: string) {
+    if (!account) throw new BadRequestException('Thiếu tài khoản');
 
+    const user = await this.userService.findByAccount(account).catch(() => null);
+    return { exists: !!user };
+  }
 
+  @Permissions('ADMIN_C_USER_VIEW')
+  @Get('check-email')
+  @ApiOperation({ summary: 'Kiểm tra có email trùng ko' })
+  async checkEmailExists(@Query('email') email: string) {
+    if (!email) throw new BadRequestException('Thiếu email');
+
+    const user = await this.userService.findByEmail(email).catch(() => null);
+    return { exists: !!user };
+  }
+
+  @Permissions('ADMIN_C_USER_CREATE')
   @Post()
   @UseInterceptors(FileInterceptor('avatar'))
   @ApiOperation({ summary: 'Create new user' })
@@ -73,6 +97,7 @@ export class UserController {
     return plainToInstance(UserDto, newUser, { excludeExtraneousValues: true });
   }
 
+  @Permissions('ADMIN_C_USER_UPDATE')
   @Put(':id')
   @UseInterceptors(FileInterceptor('avatar'))
   @ApiConsumes('multipart/form-data')
@@ -92,14 +117,16 @@ export class UserController {
     return plainToInstance(UserDto, updated, { excludeExtraneousValues: true });
   }
 
+  @Permissions('ADMIN_C_USER_UPDATE')
   @Put(':id/reset-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Reset mật khẩu về mặc định: Abcd1@34' })
-  @ApiParam({ name: 'id', type: Number, description: 'ID của user cần đổi mk' })
+  @ApiParam({ name: 'id', type: String, description: 'ID của user cần đổi mk' })
   async resetPassword(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.userService.resetPassword(id);
   }
 
+  @Permissions('ADMIN_C_USER_DELETE')
   @Delete()
   @ApiOperation({ summary: 'Delete one or many users by ID(s)' })
   @ApiBody({
@@ -119,6 +146,7 @@ export class UserController {
     await this.userService.deleteMany(ids);
   }
 
+  @Permissions('ADMIN_C_USER_UPDATE')
   @Patch(':id/status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Toggle trạng thái (active/inactive) của user' })
@@ -129,6 +157,7 @@ export class UserController {
     await this.userService.toggleStatus(id);
   }
 
+  @Permissions('ADMIN_C_USER_VIEW')
   @Post('export-excel')
   @ApiOperation({ summary: 'Export danh sách User ra Excel' })
   @ApiBody({
@@ -152,6 +181,7 @@ export class UserController {
   }
 
 
+  @Permissions('ADMIN_C_USER_CREATE')
   @Post('import-excel')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
