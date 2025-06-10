@@ -153,11 +153,13 @@ export class UserService implements IUserService {
   }
 
   async create(dto: CreateUserDto): Promise<User> {
-    const { departmentId, roleId, userType, ...rest } = dto;
+    const { password, departmentId, roleId, userType, ...rest } = dto;
 
-    const user = this.userRepository.create(rest);
-    user.password = await bcrypt.hash(rest.password, 10);
-    user.userType = userType;
+    const user = this.userRepository.create({
+      ...rest,
+      password: await bcrypt.hash(password, 10),
+      userType
+    });
 
     const usernameExists = await this.userRepository.findOne({ where: { account: rest.account } });
     if (usernameExists) {
