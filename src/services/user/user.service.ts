@@ -185,9 +185,9 @@ export class UserService implements IUserService {
       if (!role) throw new NotFoundException('Không tìm thấy quyền yêu cầu');
       user.role = role;
 
-      if (department.headEmail) {
-        user.email = department.headEmail;
-      }
+      // if (department.headEmail) {
+      //   user.email = department.headEmail;
+      // }
     }
     else if (userType === UserType.ADMIN) {
       if (!roleId) {

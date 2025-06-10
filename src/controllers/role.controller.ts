@@ -5,6 +5,7 @@ import { CreateRoleDto } from "@shared/dtos/role/create-role.dto";
 import { UpdateRoleDto } from "@shared/dtos/role/update-role.dto";
 import { Role } from "src/entities/role.entity";
 import { JwtAuthGuard } from "src/modules/auth/jwt.guard";
+import { Permissions } from "src/modules/auth/permissions.decorator";
 import { IRoleService } from "src/services/role/role.service.interface";
 
 @ApiTags('Role')
@@ -16,6 +17,8 @@ export class RoleController {
     @Inject('IRoleService')
     private readonly roleService: IRoleService) { }
 
+
+    @Permissions('ADMIN_C_ROLE_VIEW')
   @Get()
     @ApiOperation({ summary: 'Lấy danh sách Role' })
   async getAllRoles(): Promise<Role[]> {
@@ -23,6 +26,7 @@ export class RoleController {
   }
 
 
+  @Permissions('ADMIN_C_ROLE_CREATE')
   @Post()
   @ApiOperation({ summary: 'Tạo một Role mới' })
   @ApiBody({ type: CreateRoleDto })
@@ -36,6 +40,7 @@ export class RoleController {
     return this.roleService.getById(id);
   }
 
+  @Permissions('ADMIN_C_ROLE_UPDATE')
   @Put(':id')
   @ApiOperation({ summary: 'Cập nhật Role' })
   async updateRole(
@@ -45,6 +50,7 @@ export class RoleController {
     return this.roleService.updateRole(id, dto);
   }
 
+  @Permissions('ADMIN_C_ROLE_DELETE')
   @Delete()
   @ApiOperation({ summary: 'Xóa Role được chọn' })
   @HttpCode(HttpStatus.NO_CONTENT)
