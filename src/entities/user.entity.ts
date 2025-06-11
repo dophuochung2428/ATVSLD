@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, BeforeInsert, BeforeUpdate, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 import { Role } from './role.entity';
 import { Department } from './department.entity';
 import { Gender } from '../enums/gender.enum';
 import * as bcrypt from 'bcrypt';
 import { UserType } from 'src/enums/userType.enum';
 import { Exclude } from 'class-transformer';
+import { Report } from './report.entity';
 
 @Entity()
 export class User {
@@ -39,7 +40,7 @@ export class User {
     @JoinColumn({ name: 'role_id' })
     role: Role;
 
-    @Column({ type: 'date' , nullable: true})
+    @Column({ type: 'date', nullable: true })
     birthDay: Date;
 
     @Column({ type: 'enum', enum: Gender, nullable: true })
@@ -72,6 +73,8 @@ export class User {
     @Column({ nullable: true })
     avatar: string;
 
+    @OneToMany(() => Report, (report) => report.user)
+    reports: Report[];
 
     @BeforeInsert()
     @BeforeUpdate()

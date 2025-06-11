@@ -24,6 +24,25 @@ export class UserController {
     private readonly cloudinaryService: ICloudinaryService,
   ) { }
 
+    @Permissions('ADMIN_C_USER_VIEW')
+  @Get('check-account')
+  @ApiOperation({ summary: 'Kiểm tra có tài khoản trùng ko' })
+  async checkAccountExists(@Query('account') account: string) {
+    if (!account) throw new BadRequestException('Thiếu tài khoản');
+
+    const user = await this.userService.findByAccount(account).catch(() => null);
+    return { exists: !!user };
+  }
+
+  @Permissions('ADMIN_C_USER_VIEW')
+  @Get('check-email')
+  @ApiOperation({ summary: 'Kiểm tra có email trùng ko' })
+  async checkEmailExists(@Query('email') email: string) {
+    if (!email) throw new BadRequestException('Thiếu email');
+
+    const user = await this.userService.findByEmail(email).catch(() => null);
+    return { exists: !!user };
+  }
   // @Permissions('ADMIN_C_USER_VIEW')
   @Get('by-account/:account')
   @ApiOperation({ summary: 'Get User by Account' })
@@ -56,26 +75,6 @@ export class UserController {
   async getAllUsers(): Promise<UserDto[]> {
     const users = await this.userService.findAll();
     return plainToInstance(UserDto, users, { excludeExtraneousValues: true });
-  }
-
-  @Permissions('ADMIN_C_USER_VIEW')
-  @Get('check-account')
-  @ApiOperation({ summary: 'Kiểm tra có tài khoản trùng ko' })
-  async checkAccountExists(@Query('account') account: string) {
-    if (!account) throw new BadRequestException('Thiếu tài khoản');
-
-    const user = await this.userService.findByAccount(account).catch(() => null);
-    return { exists: !!user };
-  }
-
-  @Permissions('ADMIN_C_USER_VIEW')
-  @Get('check-email')
-  @ApiOperation({ summary: 'Kiểm tra có email trùng ko' })
-  async checkEmailExists(@Query('email') email: string) {
-    if (!email) throw new BadRequestException('Thiếu email');
-
-    const user = await this.userService.findByEmail(email).catch(() => null);
-    return { exists: !!user };
   }
 
   @Permissions('ADMIN_C_USER_CREATE')
