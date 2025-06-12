@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { RoleModule } from './modules/role/role.module';
+import { ReportPeriodModule } from './modules/report/report.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RoleModule } from './modules/role/role.module';
         CloudinaryModule,
         PermissionModule,
         RoleModule,
+        ReportPeriodModule
   ],
 
 })

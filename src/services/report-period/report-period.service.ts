@@ -1,37 +1,163 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateReportPeriodDto } from '@shared/dtos/report/create-report-period.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
+import { Department } from 'src/entities/department.entity';
 import { ReportPeriod } from 'src/entities/report-period.entity';
-import { Repository } from 'typeorm';
+import { Report } from 'src/entities/report.entity';
+import { ReportState } from 'src/enums/report-state.enum';
+import { DataSource, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { IReportPeriodService } from './report-period.service.interface';
 
 
 @Injectable()
-export class ReportPeriodService {
+export class ReportPeriodService implements IReportPeriodService {
     constructor(
         @InjectRepository(ReportPeriod)
         private readonly repo: Repository<ReportPeriod>,
+
+        @InjectRepository(Report)
+        private readonly reportRepo: Repository<Report>,
+
+        @InjectRepository(Department)
+        private readonly departmentRepo: Repository<Department>,
+
+        private readonly dataSource: DataSource,
     ) { }
 
-    async create(dto: CreateReportPeriodDto) {
-        const period = this.repo.create(dto);
-        return this.repo.save(period);
+    async create(dto: CreateReportPeriodDto): Promise<ReportPeriod> {
+        const queryRunner = this.dataSource.createQueryRunner();
+
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            // Validate logic
+            if (!dto.startDate || !dto.endDate) {
+                throw new BadRequestException('Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc');
+            }
+
+            const start = new Date(dto.startDate);
+            const end = new Date(dto.endDate);
+
+            if (start > end) {
+                throw new BadRequestException('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc');
+            }
+
+            const overlap = await queryRunner.manager.findOne(ReportPeriod, {
+                where: {
+                    startDate: LessThanOrEqual(end),
+                    endDate: MoreThanOrEqual(start),
+                },
+            });
+
+            if (overlap) {
+                throw new BadRequestException('Đã tồn tại kỳ báo cáo trùng hoặc giao nhau');
+            }
+
+            // Tạo kỳ báo cáo
+            const period = queryRunner.manager.create(ReportPeriod, dto);
+            const savedPeriod = await queryRunner.manager.save(ReportPeriod, period);
+
+            // Lấy doanh nghiệp
+            const departments = await queryRunner.manager.find(Department);
+
+            // Tạo danh sách báo cáo
+            const reports = departments.map((dept) =>
+                queryRunner.manager.create(Report, {
+                    department: dept,
+                    // startDate: savedPeriod.startDate,
+                    // endDate: savedPeriod.endDate,
+                    // period: savedPeriod.period,
+                    updateDate: new Date(),
+                    state: ReportState.Pending,
+                    reportPeriod: savedPeriod,
+                    user: null,
+                }),
+            );
+
+            await queryRunner.manager.save(Report, reports);
+
+            //  Commit nếu không lỗi
+            await queryRunner.commitTransaction();
+            return savedPeriod;
+        } catch (error) {
+            // Rollback nếu lỗi
+            await queryRunner.rollbackTransaction();
+            throw error;
+        } finally {
+            //  Giải phóng kết nối
+            await queryRunner.release();
+        }
     }
 
-    async findAll() {
+    async findAll(): Promise<ReportPeriod[]> {
         return this.repo.find();
     }
 
-    async findOne(id: string) {
+    async findOne(id: string): Promise<ReportPeriod> {
         const period = await this.repo.findOne({ where: { id } });
         if (!period) throw new NotFoundException('Report period not found');
         return period;
     }
 
-    async update(id: string, dto: UpdateReportPeriodDto) {
+    async update(id: string, dto: UpdateReportPeriodDto): Promise<ReportPeriod> {
         const period = await this.findOne(id);
-        Object.assign(period, dto);
-        return this.repo.save(period);
+
+        const newStart = dto.startDate ? new Date(dto.startDate) : period.startDate;
+        const newEnd = dto.endDate ? new Date(dto.endDate) : period.endDate;
+
+        if (newStart > newEnd) {
+            throw new BadRequestException('Ngày bắt đầu phải trước hoặc bằng ngày kết thúc');
+        }
+
+        const fieldsToUpdate: Partial<ReportPeriod> = {};
+        if (dto.startDate) fieldsToUpdate.startDate = new Date(dto.startDate);
+        if (dto.endDate) fieldsToUpdate.endDate = new Date(dto.endDate);
+        if (dto.active !== undefined) fieldsToUpdate.active = dto.active;
+
+        if (dto.startDate && dto.endDate) {
+            // Check xem có kỳ khác giao nhau không
+            const overlap = await this.repo.findOne({
+                where: {
+                    id: Not(id),
+                    startDate: LessThanOrEqual(newEnd),
+                    endDate: MoreThanOrEqual(newStart),
+                },
+            });
+            if (overlap) {
+                throw new BadRequestException('Đã tồn tại kỳ báo cáo khác trùng hoặc giao nhau');
+            }
+        }
+
+
+        Object.assign(period, fieldsToUpdate);
+        const updatedPeriod = await this.repo.save(period);
+
+        if (dto.startDate && dto.endDate) {
+            const submittedCount = await this.reportRepo.count({
+                where: {
+                    reportPeriod: { id },
+                    state: Not(ReportState.Pending),
+                },
+            });
+            if (submittedCount > 0) {
+                throw new BadRequestException('Không thể thay đổi ngày nếu đã có báo cáo được nộp');
+            }
+        }
+        return updatedPeriod;
     }
 
+    async toggleStatus(id: string): Promise<void> {
+        const reportPeriod = await this.repo.findOne({
+            where: { id },
+        });
+        if (!reportPeriod) {
+            throw new NotFoundException(`Không tìm thấy kì báo cáo nào với id:  ${id} `);
+        }
+
+        reportPeriod.active = !reportPeriod.active;
+
+        await this.repo.save(reportPeriod);
+    }
 }

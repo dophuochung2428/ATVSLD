@@ -24,7 +24,7 @@ export class UserController {
     private readonly cloudinaryService: ICloudinaryService,
   ) { }
 
-    @Permissions('ADMIN_C_USER_VIEW')
+  @Permissions('ADMIN_C_USER_VIEW')
   @Get('check-account')
   @ApiOperation({ summary: 'Kiểm tra có tài khoản trùng ko' })
   async checkAccountExists(@Query('account') account: string) {
@@ -202,8 +202,19 @@ export class UserController {
     }
 
     const result = await this.userService.createUsersFromExcel(file.buffer);
+
+    if (result.createdUsers.length === 0) {
+      throw new HttpException(
+        {
+          message: 'Không tạo được người dùng nào từ file Excel.',
+          errors: result.errors,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return {
-      message: 'Import hoàn tất.',
+      message: 'Import thành công',
       createdCount: result.createdUsers.length,
       errors: result.errors,
     };

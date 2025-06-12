@@ -21,18 +21,18 @@ export class Report {
     @JoinColumn({ name: 'department_id' })
     department: Department;
 
-    @Column({ type: 'date' })
-    startDate: Date;
+    // @Column({ type: 'date' })
+    // startDate: Date;
 
-    @Column({ type: 'date' })
-    endDate: Date;
+    // @Column({ type: 'date' })
+    // endDate: Date;
 
-    @Column({
-        type: 'enum',
-        enum: Period,
-        default: Period.OneYear,
-    })
-    period: Period;
+    // @Column({
+    //     type: 'enum',
+    //     enum: Period,
+    //     default: Period.OneYear,
+    // })
+    // period: Period;
 
     @Column({ type: 'date' })
     updateDate: Date;
