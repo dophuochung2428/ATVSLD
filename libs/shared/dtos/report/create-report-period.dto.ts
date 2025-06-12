@@ -3,6 +3,10 @@ import { IsEnum, IsString, IsDateString, IsOptional, IsBoolean } from 'class-val
 import { Period } from 'src/enums/period.enum';
 
 export class CreateReportPeriodDto {
+
+    @ApiProperty({example: 2025})
+    year: number;
+
     @ApiProperty({ example: 'Báo cáo ATVSLD', description: 'Mô hình báo cáo hiện tại chỉ có cái báo cáo tên này thoi' })
     @IsString()
     name: string;

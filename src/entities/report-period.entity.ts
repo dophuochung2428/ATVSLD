@@ -7,6 +7,9 @@ export class ReportPeriod {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column({ type: 'int' , nullable: true})
+    year: number;
+
     @Column({ type: 'varchar', length: 255 })
     name: string;
 
