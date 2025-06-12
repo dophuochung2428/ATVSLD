@@ -5,7 +5,7 @@ import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.
 import { JwtAuthGuard } from 'src/modules/auth/jwt.guard';
 import { IReportPeriodService } from 'src/services/report-period/report-period.service.interface';
 
-@ApiTags('Report Period')
+@ApiTags('Report Period(Quản trị hệ thống quản lý kì báo cáo)')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard)
 @Controller('report-periods')

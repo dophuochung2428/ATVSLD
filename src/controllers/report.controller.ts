@@ -1,0 +1,24 @@
+import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuards, Inject, Patch, HttpCode, HttpStatus, Query } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
+import { JwtAuthGuard } from 'src/modules/auth/jwt.guard';
+import { IReportService } from 'src/services/report-period/report-period.service.interface';
+
+@ApiTags('Report(Báo cáo của doanh nghiệp)')
+@ApiBearerAuth('JWT-auth')
+@UseGuards(JwtAuthGuard)
+@Controller('report')
+export class ReportController {
+    constructor(
+        @Inject('IReportService')
+        private readonly reportService: IReportService) { }
+
+    @Get()
+    @ApiOperation({ summary: 'Lấy thông tin báo cáo của doanh nghiệp' })
+    async getByDepartment(
+        @Query('departmentId') departmentId: string,
+    ): Promise<ReportResponseDto[]> {
+        return this.reportService.getReportsByDepartment(departmentId);
+    }
+
+}

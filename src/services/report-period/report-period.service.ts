@@ -5,9 +5,11 @@ import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.
 import { Department } from 'src/entities/department.entity';
 import { ReportPeriod } from 'src/entities/report-period.entity';
 import { Report } from 'src/entities/report.entity';
-import { ReportState } from 'src/enums/report-state.enum';
+import { ReportState, ReportStateLabel } from 'src/enums/report-state.enum';
 import { DataSource, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
-import { IReportPeriodService } from './report-period.service.interface';
+import { IReportPeriodService, IReportService } from './report-period.service.interface';
+import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
+import { PeriodLabel } from 'src/enums/period.enum';
 
 
 @Injectable()
@@ -69,7 +71,7 @@ export class ReportPeriodService implements IReportPeriodService {
                     // startDate: savedPeriod.startDate,
                     // endDate: savedPeriod.endDate,
                     // period: savedPeriod.period,
-                    updateDate: new Date(),
+                    updateDate: null,
                     state: ReportState.Pending,
                     reportPeriod: savedPeriod,
                     user: null,
@@ -161,3 +163,41 @@ export class ReportPeriodService implements IReportPeriodService {
         await this.repo.save(reportPeriod);
     }
 }
+
+
+
+
+@Injectable()
+export class ReportService implements IReportService {
+    constructor(
+        @InjectRepository(ReportPeriod)
+        private readonly repo: Repository<ReportPeriod>,
+
+        @InjectRepository(Report)
+        private readonly reportRepo: Repository<Report>,
+
+    ) { }
+
+    async getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]> {
+        const reports = await this.reportRepo.find({
+            where: { department: { id: departmentId } },
+            relations: ['department', 'user', 'reportPeriod'],
+            order: { updateDate: 'DESC' },
+        });
+
+        return reports.map(report => ({
+            id: report.id,
+            state: report.state,
+            stateLabel: ReportStateLabel[report.state],
+            departmentName: report.department?.name,
+            startDate: report.reportPeriod?.startDate,
+            endDate: report.reportPeriod?.endDate,
+            period: report.reportPeriod?.period,
+            periodLabel: PeriodLabel[report.reportPeriod?.period],
+            reportPeriodName: report.reportPeriod?.name,
+            updateDate: report.updateDate,
+            userName: report.user?.fullName || null,
+        }));
+    }
+}
+

@@ -7,7 +7,7 @@ export class ReportPeriod {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ type: 'int' , nullable: true})
+    @Column({ type: 'int', nullable: true })
     year: number;
 
     @Column({ type: 'varchar', length: 255 })
@@ -29,6 +29,8 @@ export class ReportPeriod {
     @Column({ default: true })
     active: boolean;
 
-    @OneToMany(() => Report, (report) => report.reportPeriod)
+    @OneToMany(() => Report, (report) => report.reportPeriod, {
+        cascade: ['remove'],
+    })
     reports: Report[];
 }

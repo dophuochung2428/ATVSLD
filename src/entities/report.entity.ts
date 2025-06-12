@@ -34,7 +34,7 @@ export class Report {
     // })
     // period: Period;
 
-    @Column({ type: 'date' })
+    @Column({ type: 'date', nullable: true })
     updateDate: Date;
 
     @ManyToOne(() => User, { nullable: true, eager: true })
@@ -42,7 +42,7 @@ export class Report {
     user: User;
 
 
-    @ManyToOne(() => ReportPeriod, reportPeriod => reportPeriod.reports, { eager: false })
+    @ManyToOne(() => ReportPeriod, reportPeriod => reportPeriod.reports, { onDelete: 'CASCADE', })
     @JoinColumn({ name: 'report_period_id' })
     reportPeriod: ReportPeriod;
 
