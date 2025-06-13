@@ -15,8 +15,8 @@ export class UserDto {
     @Expose()
     email: string;
 
-    @Expose()
-    phone: string;
+    // @Expose()
+    // phone: string;
 
     @Expose()
     jobTitle: string;

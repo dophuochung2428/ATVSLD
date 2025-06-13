@@ -58,8 +58,8 @@ export class User {
     @Column({ type: 'varchar', length: 10, nullable: true })
     ward: string;
 
-    @Column({ nullable: true })
-    phone: string;
+    // @Column({ nullable: true })
+    // phone: string;
 
     @Column({ length: 100 })
     email: string;

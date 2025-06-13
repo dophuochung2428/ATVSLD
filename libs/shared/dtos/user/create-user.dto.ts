@@ -30,10 +30,10 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @ApiPropertyOptional({ example: '0909123456' })
-  @IsOptional()
-  @IsString()
-  phone?: string;
+  // @ApiPropertyOptional({ example: '0909123456' })
+  // @IsOptional()
+  // @IsString()
+  // phone?: string;
 
   @ApiPropertyOptional({ example: '1999-05-01' })
   @IsOptional()
