@@ -347,15 +347,15 @@ export class UserService implements IUserService {
       const row = worksheet.getRow(i);
 
       try {
-        const gender = parseGenderLabel(row.getCell(9).text.trim());
-        const userType = parseUserTypeLabel(row.getCell(10).text.trim());
+        const gender = parseGenderLabel(row.getCell(8).text.trim());
+        const userType = parseUserTypeLabel(row.getCell(9).text.trim());
 
-        if (!gender) throw new Error(`Giới tính không hợp lệ: ${row.getCell(9).text.trim()}`);
-        if (!userType) throw new Error(`Loại người dùng không hợp lệ: ${row.getCell(10).text.trim()}`);
+        if (!gender) throw new Error(`Giới tính không hợp lệ: ${row.getCell(8).text.trim()}`);
+        if (!userType) throw new Error(`Loại người dùng không hợp lệ: ${row.getCell(9).text.trim()}`);
 
         // Lấy tên department và role từ Excel
-        const departmentName = row.getCell(11).text.trim();
-        const roleName = row.getCell(12).text.trim();
+        const departmentName = row.getCell(10).text.trim();
+        const roleName = row.getCell(11).text.trim();
 
         let departmentId: string | null = null;
         let roleId: string | null = null;
