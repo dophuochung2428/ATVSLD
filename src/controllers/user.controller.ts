@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards, Inject, Query, Param, ParseIntPipe, Post, Body, UseInterceptors, UploadedFile, Put, Delete, Patch, HttpCode, HttpStatus, Res, BadRequestException, ParseUUIDPipe, HttpException } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { JwtAuthGuard } from '../modules/auth/jwt.guard';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiConsumes, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { IUserService } from 'src/services/user/user.service.interface';
 import { plainToInstance } from 'class-transformer';
 import { UserDto } from '@shared/dtos/user/user.dto';
@@ -27,8 +27,9 @@ export class UserController {
   @Permissions('ADMIN_C_USER_VIEW')
   @Get('check-account')
   @ApiOperation({ summary: 'Kiểm tra có tài khoản trùng ko' })
+  @ApiQuery({ name: 'account', required: false })
   async checkAccountExists(@Query('account') account: string) {
-    if (!account) throw new BadRequestException('Thiếu tài khoản');
+    if (!account) return { exists: false };
 
     const user = await this.userService.findByAccount(account).catch(() => null);
     return { exists: !!user };
@@ -37,8 +38,9 @@ export class UserController {
   @Permissions('ADMIN_C_USER_VIEW')
   @Get('check-email')
   @ApiOperation({ summary: 'Kiểm tra có email trùng ko' })
+  @ApiQuery({ name: 'email', required: false })
   async checkEmailExists(@Query('email') email: string) {
-    if (!email) throw new BadRequestException('Thiếu email');
+    if (!email) return { exists: false };
 
     const user = await this.userService.findByEmail(email).catch(() => null);
     return { exists: !!user };

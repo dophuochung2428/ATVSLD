@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Inject, Param, ParseUUIDPipe, Post, Put, UseGuards } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, HttpCode, HttpStatus, Inject, Param, ParseUUIDPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { CreateRoleDto } from "@shared/dtos/role/create-role.dto";
 import { UpdateRoleDto } from "@shared/dtos/role/update-role.dto";
 import { Role } from "src/entities/role.entity";
@@ -17,10 +17,21 @@ export class RoleController {
     @Inject('IRoleService')
     private readonly roleService: IRoleService) { }
 
+  @Permissions('ADMIN_C_ROLE_VIEW')
+  @Get('check-code')
+  @ApiOperation({ summary: 'Kiểm tra role code có tồn tại không' })
+  @ApiQuery({ name: 'code', required: false })
+  async checkRoleCodeExists(@Query('code') code: string) {
+    if (!code) return { exists: false };
 
-    @Permissions('ADMIN_C_ROLE_VIEW')
+    const role = await this.roleService.getByCode(code).catch(() => null);
+    return { exists: !!role };
+  }
+
+
+  @Permissions('ADMIN_C_ROLE_VIEW')
   @Get()
-    @ApiOperation({ summary: 'Lấy danh sách Role' })
+  @ApiOperation({ summary: 'Lấy danh sách Role' })
   async getAllRoles(): Promise<Role[]> {
     return this.roleService.getAllRoles();
   }

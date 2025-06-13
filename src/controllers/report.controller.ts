@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuar
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt.guard';
+import { Permissions } from 'src/modules/auth/permissions.decorator';
 import { IReportService } from 'src/services/report-period/report-period.service.interface';
 
 @ApiTags('Report(Báo cáo của doanh nghiệp)')
@@ -13,6 +14,7 @@ export class ReportController {
         @Inject('IReportService')
         private readonly reportService: IReportService) { }
 
+    @Permissions('USER_C_REPORT_VIEW')
     @Get()
     @ApiOperation({ summary: 'Lấy thông tin báo cáo của doanh nghiệp' })
     async getByDepartment(

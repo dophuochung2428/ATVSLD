@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } 
 import { CreateReportPeriodDto } from '@shared/dtos/report/create-report-period.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt.guard';
+import { Permissions } from 'src/modules/auth/permissions.decorator';
 import { IReportPeriodService } from 'src/services/report-period/report-period.service.interface';
 
 @ApiTags('Report Period(Quản trị hệ thống quản lý kì báo cáo)')
@@ -14,6 +15,7 @@ export class ReportPeriodController {
     @Inject('IReportPeriodService')
     private readonly reportPeriodService: IReportPeriodService) { }
 
+  @Permissions('ADMIN_C_REPORT_CREATE')
   @ApiOperation({ summary: 'Tạo kỳ báo cáo' })
   @ApiBody({ type: CreateReportPeriodDto })
   @Post()
@@ -21,13 +23,14 @@ export class ReportPeriodController {
     return this.reportPeriodService.create(dto);
   }
 
+  @Permissions('ADMIN_C_REPORT_VIEW')
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách kỳ báo cáo' })
   async findAll() {
     return this.reportPeriodService.findAll();
   }
 
-
+  @Permissions('ADMIN_C_REPORT_VIEW')
   @Get(':id')
   @ApiOperation({ summary: 'Lấy chi tiết kỳ báo cáo' })
   @ApiParam({ name: 'id', description: 'ID kỳ báo cáo' })
@@ -35,6 +38,7 @@ export class ReportPeriodController {
     return this.reportPeriodService.findOne(id);
   }
 
+  @Permissions('ADMIN_C_REPORT_UPDATE')
   @Put(':id')
   @ApiOperation({ summary: 'Cập nhật kỳ báo cáo' })
   @ApiBody({ type: UpdateReportPeriodDto })
@@ -43,6 +47,7 @@ export class ReportPeriodController {
     return this.reportPeriodService.update(id, dto);
   }
 
+  @Permissions('ADMIN_C_REPORT_UPDATE')
   @Patch(':id/status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Toggle trạng thái (active/inactive) của kì báo cáo' })
