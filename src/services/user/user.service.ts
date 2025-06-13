@@ -136,8 +136,15 @@ export class UserService implements IUserService {
     });
   }
 
-  async updatePassword(userId: string, hashedPassword: string): Promise<void> {
-    await this.userRepository.update(userId, { password: hashedPassword });
+  async updatePassword(userId: string, rawPassword: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const hashed = await bcrypt.hash(rawPassword, 10);
+    user.password = hashed;
+    await this.userRepository.save(user);
   }
 
   async resetPassword(userId: string): Promise<void> {
@@ -147,9 +154,8 @@ export class UserService implements IUserService {
     }
 
     const defaultPassword = 'Abcd1@34';
-    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
 
-    await this.updatePassword(user.id, hashedPassword);
+    await this.updatePassword(user.id, defaultPassword);
   }
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -164,10 +170,11 @@ export class UserService implements IUserService {
     if (emailExists) {
       throw new BadRequestException('Email đã tồn tại');
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = this.userRepository.create({
       ...rest,
-      password,
+      password: hashedPassword,
       userType
     });
 

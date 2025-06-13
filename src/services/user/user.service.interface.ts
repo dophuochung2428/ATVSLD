@@ -11,7 +11,7 @@ export interface IUserService {
   findByEmail(email: string): Promise<User | null>;
   findByAccountWithDepartment(account: string): Promise<User | null>;
   findPermissionWithRoleId(id: string): Promise<User | null>
-  updatePassword(userId: string, hashedPassword: string): Promise<void>;
+  updatePassword(userId: string, rawPassword: string): Promise<void>
   create(dto: CreateUserDto): Promise<User>
   update(id: string, dto: UpdateUserDto): Promise<User>
   deleteMany(ids: string[]): Promise<void>

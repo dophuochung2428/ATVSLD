@@ -57,10 +57,9 @@ export class AuthService implements IAuthService {
 
     // Create new pass
     const newPassword = this.generateRandomPassword();
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update new pass to data base
-    await this.userService.updatePassword(user.id, hashedPassword);
+    await this.userService.updatePassword(user.id, newPassword);
 
     // Send email
     const loginUrl = 'https://your-frontend/login';
@@ -73,26 +72,5 @@ export class AuthService implements IAuthService {
   private generateRandomPassword(): string {
     return Math.random().toString(36).slice(-8);
   }
-
-  // async resetPassword(token: string, newPassword: string) {
-  //   let payload: ResetPasswordPayload;
-  //   try {
-  //     payload = await this.jwtService.verifyAsync<ResetPasswordPayload>(token, {
-  //       secret: process.env.JWT_SECRET,
-  //     });
-  //   } catch (err) {
-  //     throw new BadRequestException('Token không hợp lệ hoặc đã hết hạn');
-  //   }
-
-  //   const user = await this.userService.findById(payload.sub);
-  //   if (!user) {
-  //     throw new NotFoundException('Người dùng không tồn tại');
-  //   }
-
-  //   const updatePassword = await bcrypt.hash(newPassword, 10);
-  //   await this.userService.updatePassword(user.id, updatePassword);
-
-  //   return { message: 'Mật khẩu đã được cập nhật thành công' };
-  // }
 
 }
