@@ -10,6 +10,8 @@ import { DataSource, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 't
 import { IReportPeriodService, IReportService } from './report-period.service.interface';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { PeriodLabel } from 'src/enums/period.enum';
+import { ReportNameLabel } from 'src/enums/reportName.enum';
+import { ReportPeriodResponseDto } from '@shared/dtos/report/report-period-response.dto';
 
 
 @Injectable()
@@ -93,14 +95,36 @@ export class ReportPeriodService implements IReportPeriodService {
         }
     }
 
-    async findAll(): Promise<ReportPeriod[]> {
-        return this.repo.find();
+    async findAll(): Promise<ReportPeriodResponseDto[]> {
+        const periods = await this.repo.find();
+
+        return periods.map(period => ({
+            id: period.id,
+            year: period.year,
+            name: period.name,
+            reportPeriodNameLabel: ReportNameLabel[period.name],
+            period: period.period,
+            periodLabel: PeriodLabel[period.period],
+            startDate: period.startDate,
+            endDate: period.endDate,
+            active: period.active,
+        }));
     }
 
-    async findOne(id: string): Promise<ReportPeriod> {
+    async findOne(id: string): Promise<ReportPeriodResponseDto> {
         const period = await this.repo.findOne({ where: { id } });
         if (!period) throw new NotFoundException('Report period not found');
-        return period;
+        return {
+            id: period.id,
+            year: period.year,
+            name: period.name,
+            reportPeriodNameLabel: ReportNameLabel[period.name],
+            period: period.period,
+            periodLabel: PeriodLabel[period.period],
+            startDate: period.startDate,
+            endDate: period.endDate,
+            active: period.active,
+        };
     }
 
     async update(id: string, dto: UpdateReportPeriodDto): Promise<ReportPeriod> {
@@ -162,6 +186,15 @@ export class ReportPeriodService implements IReportPeriodService {
 
         await this.repo.save(reportPeriod);
     }
+
+    async deleteMany(ids: string[]): Promise<void> {
+        if (!ids || ids.length === 0) {
+            throw new BadRequestException('Không có kỳ báo cáo nào được chọn để xoá');
+        }
+
+        await this.repo.delete(ids);
+    }
+
 }
 
 
@@ -195,6 +228,7 @@ export class ReportService implements IReportService {
             period: report.reportPeriod?.period,
             periodLabel: PeriodLabel[report.reportPeriod?.period],
             reportPeriodName: report.reportPeriod?.name,
+            reportPeriodNameLabel: ReportNameLabel[report.reportPeriod?.name],
             updateDate: report.updateDate,
             userName: report.user?.fullName || null,
         }));

@@ -58,4 +58,25 @@ export class ReportPeriodController {
     await this.reportPeriodService.toggleStatus(id);
   }
 
+  @Delete()
+  @ApiOperation({ summary: 'Xóa những report được chọn' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        ids: {
+          type: 'array',
+          items: { type: 'string' },
+          example: ['id1', 'id2']
+        },
+      },
+      required: ['ids'],
+    }
+  })
+  async deleteMany(@Body('ids') ids: string[]): Promise<void> {
+    return this.reportPeriodService.deleteMany(ids);
+  }
+
+
 }

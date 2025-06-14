@@ -1,6 +1,7 @@
 import { Period } from 'src/enums/period.enum';
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Report } from './report.entity';
+import { ReportName } from 'src/enums/reportName.enum';
 
 @Entity('report_periods')
 export class ReportPeriod {
@@ -10,8 +11,12 @@ export class ReportPeriod {
     @Column({ type: 'int', nullable: true })
     year: number;
 
-    @Column({ type: 'varchar', length: 255 })
-    name: string;
+    @Column({
+        type: 'enum',
+        enum: ReportName,
+        default: ReportName.Name,
+    })
+    name: ReportName;
 
     @Column({
         type: 'enum',

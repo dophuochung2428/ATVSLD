@@ -1,15 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString, IsDateString, IsOptional, IsBoolean } from 'class-validator';
 import { Period } from 'src/enums/period.enum';
+import { ReportName } from 'src/enums/reportName.enum';
 
 export class CreateReportPeriodDto {
 
     @ApiProperty({example: 2025})
     year: number;
 
-    @ApiProperty({ example: 'Báo cáo ATVSLD', description: 'Mô hình báo cáo hiện tại chỉ có cái báo cáo tên này thoi' })
-    @IsString()
-    name: string;
+    @ApiProperty({ enum: ReportName, example: ReportName.Name, description: 'Tên báo cáo'})
+    @IsEnum(ReportName)
+    name: ReportName;
 
     @ApiProperty({ enum: Period, example: Period.OneYear, description: 'Chu kỳ báo cáo' })
     @IsEnum(Period)

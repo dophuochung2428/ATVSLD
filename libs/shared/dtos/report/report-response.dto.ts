@@ -1,5 +1,6 @@
 import { Period } from "src/enums/period.enum";
 import { ReportState } from "src/enums/report-state.enum";
+import { ReportName } from "src/enums/reportName.enum";
 
 export class ReportResponseDto {
   id: string;
@@ -9,7 +10,7 @@ export class ReportResponseDto {
   startDate: Date;
   endDate: Date;
   period: Period;
-  reportPeriodName: string;
+  reportPeriodName: ReportName;
   updateDate: Date;
   userName?: string;
 }
