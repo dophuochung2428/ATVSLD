@@ -36,7 +36,13 @@ export class ReportPeriodService implements IReportPeriodService {
         await queryRunner.startTransaction();
 
         try {
-           
+            if (!dto.startDate || isNaN(new Date(dto.startDate).getTime())) {
+                throw new BadRequestException('Ngày bắt đầu không hợp lệ');
+            }
+
+            if (!dto.endDate || isNaN(new Date(dto.endDate).getTime())) {
+                throw new BadRequestException('Ngày kết thúc không hợp lệ');
+            }
             const start = new Date(dto.startDate);
             const end = new Date(dto.endDate);
 
