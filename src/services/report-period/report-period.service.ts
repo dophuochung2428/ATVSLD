@@ -36,11 +36,7 @@ export class ReportPeriodService implements IReportPeriodService {
         await queryRunner.startTransaction();
 
         try {
-            // Validate logic
-            if (!dto.startDate || !dto.endDate) {
-                throw new BadRequestException('Vui lòng nhập đầy đủ ngày bắt đầu và ngày kết thúc');
-            }
-
+           
             const start = new Date(dto.startDate);
             const end = new Date(dto.endDate);
 
