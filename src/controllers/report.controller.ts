@@ -24,10 +24,13 @@ export class ReportController {
     }
 
     @Permissions('USER_C_REPORT_VIEW')
-    @Get('by-report-year/:year')
+    @Get('by-department/:departmentId/year/:year')
     @ApiOperation({ summary: 'Lấy thông tin báo cáo của doanh nghiệp theo năm' })
-    getReportsByReportPeriodYear(@Param('year') year: string) {
-        return this.reportService.getReportsByPeriodYear(Number(year));
+    getReportsByReportPeriodYear(
+        @Param('departmentId') departmentId: string,
+        @Param('year') year: string
+    ) {
+        return this.reportService.getReportsByPeriodYear(departmentId, Number(year));
     }
 
 
