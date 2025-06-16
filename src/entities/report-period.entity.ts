@@ -8,7 +8,7 @@ export class ReportPeriod {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ type: 'int', nullable: true })
+    @Column({ type: 'int', nullable: true, unique: true })
     year: number;
 
     @Column({

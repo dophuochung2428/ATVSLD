@@ -12,6 +12,7 @@ import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { PeriodLabel } from 'src/enums/period.enum';
 import { ReportNameLabel } from 'src/enums/reportName.enum';
 import { ReportPeriodResponseDto } from '@shared/dtos/report/report-period-response.dto';
+import { CreateReportDto } from '@shared/dtos/report/create-report.dto';
 
 
 @Injectable()
@@ -194,7 +195,7 @@ export class ReportPeriodService implements IReportPeriodService {
         const periods = await this.repo
             .createQueryBuilder('period')
             .where('period.startDate <= :currentDate AND period.endDate >= :currentDate', { currentDate })
-            .andWhere('period.active = :active', { active: true }) 
+            .andWhere('period.active = :active', { active: true })
             .getMany();
 
         return periods.map((period) => ({
@@ -232,6 +233,9 @@ export class ReportService implements IReportService {
         @InjectRepository(Report)
         private readonly reportRepo: Repository<Report>,
 
+        @InjectRepository(Department)
+        private readonly departmentRepo: Repository<Department>,
+
     ) { }
 
     async getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]> {
@@ -255,6 +259,45 @@ export class ReportService implements IReportService {
             updateDate: report.updateDate,
             userName: report.user?.fullName || null,
         }));
+    }
+
+    async createReport(dto: CreateReportDto): Promise<Report> {
+        // Kiểm tra department
+        const department = await this.departmentRepo.findOne({ where: { id: dto.departmentId } });
+        if (!department) {
+            throw new NotFoundException(`Không tìm thấy phòng ban với id: ${dto.departmentId}`);
+        }
+
+        // Kiểm tra reportPeriod
+        const reportPeriod = await this.repo.findOne({ where: { id: dto.reportPeriodId } });
+        if (!reportPeriod) {
+            throw new NotFoundException(`Không tìm thấy kỳ báo cáo với id: ${dto.reportPeriodId}`);
+        }
+
+        // Kiểm tra báo cáo trùng
+        const existingReport = await this.reportRepo.findOne({
+            where: {
+                department: { id: dto.departmentId },
+                reportPeriod: { id: dto.reportPeriodId },
+            },
+            relations: ['department', 'reportPeriod'],
+        });
+        if (existingReport) {
+            throw new BadRequestException('Báo cáo đã tồn tại cho phòng ban và kỳ báo cáo này');
+        }
+
+        // Tạo báo cáo mới
+        const report = this.reportRepo.create({
+
+            department: department,
+            updateDate: null, 
+            state: ReportState.Expired,
+            user: null, 
+            reportPeriod: reportPeriod,
+
+        });
+
+        return this.reportRepo.save(report);
     }
 }
 

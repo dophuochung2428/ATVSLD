@@ -188,24 +188,24 @@ export class DepartmentService implements IDepartmentService {
 
     const savedDepartment = await this.departmentRepository.save(department);
 
-    // // Lấy tất cả kỳ báo cáo hiện tại
-    // const reportPeriods = await this.reportPeriodService.getAllRelevantReportPeriods();
-    // const currentDate = new Date();
+    // Lấy tất cả kỳ báo cáo hiện tại
+    const reportPeriods = await this.reportPeriodService.getAllRelevantReportPeriods();
+    const currentDate = new Date();
 
-    // // Duyệt qua từng kỳ báo cáo
-    // for (const period of reportPeriods) {
-    //   const startDate = new Date(period.startDate);
-    //   const endDate = new Date(period.endDate);
+    // Duyệt qua từng kỳ báo cáo
+    for (const period of reportPeriods) {
+      const startDate = new Date(period.startDate);
+      const endDate = new Date(period.endDate);
 
-    //   // Xác nhận ngày hiện tại nằm trong khoảng startDate và endDate
-    //   if (currentDate >= startDate && currentDate <= endDate) {
-    //     await this.reportService.create( Report, {
-    //       departmentId: savedDepartment.id,
-    //       reportPeriodId: period.id,
-    //       state: ReportState.Expired,
-    //     });
-    //   }
-    // }
+      // Xác nhận ngày hiện tại nằm trong khoảng startDate và endDate
+      if (currentDate >= startDate) {
+        await this.reportService.createReport({
+          departmentId: savedDepartment.id,
+          reportPeriodId: period.id,
+          state: ReportState.Expired,
+        });
+      }
+    }
 
     const businessFile = await this.uploadBusinessFile(files.business_license, 'Giấy phép kinh doanh', savedDepartment);
     const otherFile = await this.uploadBusinessFile(files.other_document, 'Giấy tờ khác', savedDepartment);

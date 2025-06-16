@@ -1,8 +1,10 @@
 import { CreateReportPeriodDto } from '@shared/dtos/report/create-report-period.dto';
+import { CreateReportDto } from '@shared/dtos/report/create-report.dto';
 import { ReportPeriodResponseDto } from '@shared/dtos/report/report-period-response.dto';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
 import { ReportPeriod } from 'src/entities/report-period.entity';
+import { Report } from 'src/entities/report.entity';
 
 export interface IReportPeriodService {
   create(dto: CreateReportPeriodDto): Promise<ReportPeriod>;
@@ -17,4 +19,5 @@ export interface IReportPeriodService {
 
 export interface IReportService {
   getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]>
+  createReport(dto: CreateReportDto): Promise<Report> 
 }
