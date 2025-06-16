@@ -19,6 +19,6 @@ export interface IReportPeriodService {
 
 export interface IReportService {
   getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]>
-  getReportsByPeriodYear(year: number): Promise<ReportResponseDto[]>
-  createReport(dto: CreateReportDto): Promise<Report> 
+  getReportsByPeriodYear(departmentId: string, year: number): Promise<ReportResponseDto[]>
+  createReport(dto: CreateReportDto): Promise<Report>
 }

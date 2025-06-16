@@ -262,10 +262,11 @@ export class ReportService implements IReportService {
         }));
     }
 
-    async getReportsByPeriodYear(year: number): Promise<ReportResponseDto[]> {
+    async getReportsByPeriodYear(departmentId: string, year: number): Promise<ReportResponseDto[]> {
         const reports = await this.reportRepo.find({
             where: {
-                reportPeriod: { year: Equal(year) },
+             department: { id: departmentId },
+      reportPeriod: { year: year },
             },
             relations: ['department', 'user', 'reportPeriod'],
             order: { updateDate: 'DESC' },
