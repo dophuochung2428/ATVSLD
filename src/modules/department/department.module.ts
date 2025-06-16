@@ -8,12 +8,14 @@ import { User } from 'src/entities/user.entity';
 import { BusinessFile } from 'src/entities/business-file.entity';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { RegionModule } from '../region/region.module';
+import { ReportPeriodModule } from '../report/report.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Department, User, BusinessFile]),
   UserModule, 
   CloudinaryModule,
   RegionModule,
+  ReportPeriodModule
 ],
   controllers: [DepartmentController],
   providers: [
