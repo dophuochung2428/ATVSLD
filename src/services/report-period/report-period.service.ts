@@ -6,7 +6,7 @@ import { Department } from 'src/entities/department.entity';
 import { ReportPeriod } from 'src/entities/report-period.entity';
 import { Report } from 'src/entities/report.entity';
 import { ReportState, ReportStateLabel } from 'src/enums/report-state.enum';
-import { DataSource, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { DataSource, Equal, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { IReportPeriodService, IReportService } from './report-period.service.interface';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { PeriodLabel } from 'src/enums/period.enum';
@@ -247,6 +247,7 @@ export class ReportService implements IReportService {
 
         return reports.map(report => ({
             id: report.id,
+            year: report.reportPeriod.year,
             state: report.state,
             stateLabel: ReportStateLabel[report.state],
             departmentName: report.department?.name,
@@ -260,6 +261,33 @@ export class ReportService implements IReportService {
             userName: report.user?.fullName || null,
         }));
     }
+
+    async getReportsByPeriodYear(year: number): Promise<ReportResponseDto[]> {
+        const reports = await this.reportRepo.find({
+            where: {
+                reportPeriod: { year: Equal(year) },
+            },
+            relations: ['department', 'user', 'reportPeriod'],
+            order: { updateDate: 'DESC' },
+        });
+
+        return reports.map(report => ({
+            id: report.id,
+            year: report.reportPeriod.year,
+            state: report.state,
+            stateLabel: ReportStateLabel[report.state],
+            departmentName: report.department?.name,
+            startDate: report.reportPeriod?.startDate,
+            endDate: report.reportPeriod?.endDate,
+            period: report.reportPeriod?.period,
+            periodLabel: PeriodLabel[report.reportPeriod?.period],
+            reportPeriodName: report.reportPeriod?.name,
+            reportPeriodNameLabel: ReportNameLabel[report.reportPeriod?.name],
+            updateDate: report.updateDate,
+            userName: report.user?.fullName || null,
+        }));
+    }
+
 
     async createReport(dto: CreateReportDto): Promise<Report> {
         // Kiểm tra department
@@ -290,9 +318,9 @@ export class ReportService implements IReportService {
         const report = this.reportRepo.create({
 
             department: department,
-            updateDate: null, 
+            updateDate: null,
             state: ReportState.Expired,
-            user: null, 
+            user: null,
             reportPeriod: reportPeriod,
 
         });
