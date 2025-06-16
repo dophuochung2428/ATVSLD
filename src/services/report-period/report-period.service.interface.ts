@@ -11,6 +11,7 @@ export interface IReportPeriodService {
   update(id: string, dto: UpdateReportPeriodDto): Promise<ReportPeriod>;
   toggleStatus(id: string): Promise<void>
   deleteMany(ids: string[]): Promise<void>
+  getAllRelevantReportPeriods(): Promise<ReportPeriodResponseDto[]>
 }
 
 

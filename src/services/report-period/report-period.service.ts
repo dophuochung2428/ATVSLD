@@ -189,6 +189,27 @@ export class ReportPeriodService implements IReportPeriodService {
         await this.repo.save(reportPeriod);
     }
 
+    async getAllRelevantReportPeriods(): Promise<ReportPeriodResponseDto[]> {
+        const currentDate = new Date();
+        const periods = await this.repo
+            .createQueryBuilder('period')
+            .where('period.startDate <= :currentDate AND period.endDate >= :currentDate', { currentDate })
+            .andWhere('period.active = :active', { active: true }) 
+            .getMany();
+
+        return periods.map((period) => ({
+            id: period.id,
+            year: period.year,
+            name: period.name,
+            reportPeriodNameLabel: ReportNameLabel[period.name],
+            period: period.period,
+            periodLabel: PeriodLabel[period.period],
+            startDate: period.startDate,
+            endDate: period.endDate,
+            active: period.active,
+        }));
+    }
+
     async deleteMany(ids: string[]): Promise<void> {
         if (!ids || ids.length === 0) {
             throw new BadRequestException('Không có kỳ báo cáo nào được chọn để xoá');

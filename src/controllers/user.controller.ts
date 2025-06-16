@@ -66,7 +66,7 @@ export class UserController {
   // @Permissions('ADMIN_C_USER_VIEW')
   @Get(':id')
   @ApiOperation({ summary: 'Get User By ID' })
-  async getUserById(@Param('id', ParseIntPipe) id: string): Promise<UserDto> {
+  async getUserById(@Param('id', ParseUUIDPipe) id: string): Promise<UserDto> {
     const user = await this.userService.findById(id);
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
@@ -136,8 +136,8 @@ export class UserController {
       properties: {
         ids: {
           type: 'array',
-          items: { type: 'integer' },
-          example: [1, 2, 3]
+          items: { type: 'string' },
+          example: ['id1', 'id2']
         }
       },
       required: ['ids']

@@ -16,6 +16,9 @@ import { PaginationQueryDto } from '@shared/dtos/pagination/pagination-query.dto
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { BusinessType } from 'src/enums/businessType.enum';
+import { IReportPeriodService, IReportService } from '../report-period/report-period.service.interface';
+import { ReportState } from 'src/enums/report-state.enum';
+import { Report } from 'src/entities/report.entity';
 
 
 @Injectable()
@@ -29,7 +32,10 @@ export class DepartmentService implements IDepartmentService {
     private businessFileRepository: Repository<BusinessFile>,
     @Inject('ICloudinaryService')
     private readonly cloudinaryService: ICloudinaryService,
-
+    @Inject('IReportPeriodService')
+    private readonly reportPeriodService: IReportPeriodService,
+    @Inject('IReportService')
+    private readonly reportService: IReportService,
     private readonly regionService: RegionService,
     private readonly dataSource: DataSource,
   ) { }
@@ -181,6 +187,25 @@ export class DepartmentService implements IDepartmentService {
     }
 
     const savedDepartment = await this.departmentRepository.save(department);
+
+    // Lấy tất cả kỳ báo cáo hiện tại
+    const reportPeriods = await this.reportPeriodService.getAllRelevantReportPeriods();
+    const currentDate = new Date();
+
+    // // Duyệt qua từng kỳ báo cáo
+    // for (const period of reportPeriods) {
+    //   const startDate = new Date(period.startDate);
+    //   const endDate = new Date(period.endDate);
+
+    //   // Xác nhận ngày hiện tại nằm trong khoảng startDate và endDate
+    //   if (currentDate >= startDate && currentDate <= endDate) {
+    //     await this.reportService.create( Report, {
+    //       departmentId: savedDepartment.id,
+    //       reportPeriodId: period.id,
+    //       state: ReportState.Expired,
+    //     });
+    //   }
+    // }
 
     const businessFile = await this.uploadBusinessFile(files.business_license, 'Giấy phép kinh doanh', savedDepartment);
     const otherFile = await this.uploadBusinessFile(files.other_document, 'Giấy tờ khác', savedDepartment);
