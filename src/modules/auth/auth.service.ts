@@ -42,7 +42,11 @@ export class AuthService implements IAuthService {
       throw new BadRequestException('Vui lòng nhập đầy đủ tài khoản và mật khẩu.');
     }
 
-    const payload = { sub: user.id, role: user.role.code };
+    const payload = {
+      sub: user.id,
+      role: user.role.code,
+      ...(user.department?.id && { departmentId: user.department.id }),
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };

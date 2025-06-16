@@ -188,9 +188,9 @@ export class DepartmentService implements IDepartmentService {
 
     const savedDepartment = await this.departmentRepository.save(department);
 
-    // Lấy tất cả kỳ báo cáo hiện tại
-    const reportPeriods = await this.reportPeriodService.getAllRelevantReportPeriods();
-    const currentDate = new Date();
+    // // Lấy tất cả kỳ báo cáo hiện tại
+    // const reportPeriods = await this.reportPeriodService.getAllRelevantReportPeriods();
+    // const currentDate = new Date();
 
     // // Duyệt qua từng kỳ báo cáo
     // for (const period of reportPeriods) {
