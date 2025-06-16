@@ -33,5 +33,11 @@ export class ReportController {
         return this.reportService.getReportsByPeriodYear(departmentId, Number(year));
     }
 
+    @Post('cron/expire-reports')
+    @HttpCode(200)
+    async expirePendingReports() {
+        await this.reportService.markReportsAsExpired();
+        return { message: 'Đã kiểm tra và chuyển trạng thái báo cáo quá hạn.' };
+    }
 
 }

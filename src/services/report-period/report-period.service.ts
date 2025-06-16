@@ -6,7 +6,7 @@ import { Department } from 'src/entities/department.entity';
 import { ReportPeriod } from 'src/entities/report-period.entity';
 import { Report } from 'src/entities/report.entity';
 import { ReportState, ReportStateLabel } from 'src/enums/report-state.enum';
-import { DataSource, Equal, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { DataSource, Equal, In, LessThan, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { IReportPeriodService, IReportService } from './report-period.service.interface';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { PeriodLabel } from 'src/enums/period.enum';
@@ -265,8 +265,8 @@ export class ReportService implements IReportService {
     async getReportsByPeriodYear(departmentId: string, year: number): Promise<ReportResponseDto[]> {
         const reports = await this.reportRepo.find({
             where: {
-             department: { id: departmentId },
-      reportPeriod: { year: year },
+                department: { id: departmentId },
+                reportPeriod: { year: year },
             },
             relations: ['department', 'user', 'reportPeriod'],
             order: { updateDate: 'DESC' },
@@ -288,7 +288,6 @@ export class ReportService implements IReportService {
             userName: report.user?.fullName || null,
         }));
     }
-
 
     async createReport(dto: CreateReportDto): Promise<Report> {
         // Kiểm tra department
@@ -327,6 +326,37 @@ export class ReportService implements IReportService {
         });
 
         return this.reportRepo.save(report);
+    }
+
+    async markReportsAsExpired(): Promise<void> {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // reset về 00:00
+
+        // Tìm tất cả kỳ báo cáo đã kết thúc
+        const expiredPeriods = await this.repo.find({
+            where: {
+                endDate: LessThan(today),
+            },
+        });
+
+        if (expiredPeriods.length === 0) return;
+
+        for (const period of expiredPeriods) {
+            const targetReports = await this.reportRepo.find({
+                where: {
+                    reportPeriod: { id: period.id },
+                    state: In([ReportState.Pending, ReportState.Typing]),
+                },
+            });
+
+            if (targetReports.length === 0) continue;
+
+            for (const report of targetReports) {
+                report.state = ReportState.Expired;
+            }
+
+            await this.reportRepo.save(targetReports);
+        }
     }
 }
 

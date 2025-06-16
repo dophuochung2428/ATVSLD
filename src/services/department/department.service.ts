@@ -177,13 +177,16 @@ export class DepartmentService implements IDepartmentService {
     }
     const department = this.departmentRepository.create(createDto);
 
-    if (createDto.headEmail) {
-      const user = await this.checkUserCanBeHead(createDto.headEmail);
+    if (createDto.headEmail?.trim()) {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: createDto.headEmail.trim() },
+      });
 
-      department.headEmail = user.email;
+      if (existingUser) {
+        throw new BadRequestException('Email này đã tồn tại trong hệ thống người dùng');
+      }
 
-      user.department = department;
-      await this.userRepository.save(user);
+      department.headEmail = createDto.headEmail.trim();
     }
 
     const savedDepartment = await this.departmentRepository.save(department);

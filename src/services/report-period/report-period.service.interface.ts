@@ -21,4 +21,5 @@ export interface IReportService {
   getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]>
   getReportsByPeriodYear(departmentId: string, year: number): Promise<ReportResponseDto[]>
   createReport(dto: CreateReportDto): Promise<Report>
+  markReportsAsExpired(): Promise<void>
 }
