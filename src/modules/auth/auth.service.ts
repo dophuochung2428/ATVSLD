@@ -45,6 +45,7 @@ export class AuthService implements IAuthService {
     const payload = {
       sub: user.id,
       role: user.role.code,
+      roleId: user.role.id,
       ...(user.department?.id && { departmentId: user.department.id }),
     };
     return {
