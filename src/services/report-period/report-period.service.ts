@@ -237,6 +237,18 @@ export class ReportPeriodService implements IReportPeriodService {
         return !!found;
     }
 
+    async getActiveYears(): Promise<number[]> {
+        const periods = await this.repo
+            .createQueryBuilder('period')
+            .select('DISTINCT period.year', 'year')
+            .where('period.active = :active', { active: true })
+            .orderBy('period.year', 'ASC')
+            .getRawMany();
+
+        return periods.map(p => p.year);
+    }
+
+
 }
 
 

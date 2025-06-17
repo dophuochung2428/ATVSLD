@@ -85,5 +85,12 @@ export class ReportPeriodController {
     return { exists };
   }
 
+  @Get('active-years')
+  @ApiOperation({ summary: 'Lấy danh sách các năm của kỳ báo cáo đang hoạt động' })
+  async getActiveYears(): Promise<number[]> {
+    return this.reportPeriodService.getActiveYears();
+  }
+
+
 
 }
