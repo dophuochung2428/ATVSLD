@@ -240,7 +240,10 @@ export class ReportService implements IReportService {
 
     async getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]> {
         const reports = await this.reportRepo.find({
-            where: { department: { id: departmentId } },
+            where: {
+                department: { id: departmentId },
+                reportPeriod: { active: true },
+            },
             relations: ['department', 'user', 'reportPeriod'],
             order: { updateDate: 'DESC' },
         });
