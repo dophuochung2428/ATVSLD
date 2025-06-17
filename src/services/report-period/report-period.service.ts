@@ -194,7 +194,7 @@ export class ReportPeriodService implements IReportPeriodService {
         const currentDate = new Date();
         const periods = await this.repo
             .createQueryBuilder('period')
-            .where('period.startDate <= :currentDate AND period.endDate >= :currentDate', { currentDate })
+            .where('period.startDate <= :currentDate', { currentDate })
             .andWhere('period.active = :active', { active: true })
             .getMany();
 

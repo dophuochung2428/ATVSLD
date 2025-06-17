@@ -120,16 +120,24 @@ export class DepartmentService implements IDepartmentService {
   }
 
   async checkUserCanBeHead(email: string) {
-    const user = await this.userRepository.findOne({
+    const departmentWithThisHead = await this.departmentRepository.findOne({
       where: {
-        email,
-        department: null,
+        headEmail: email
       },
     });
-    if (!user) {
-      throw new BadRequestException('User không tồn tại hoặc đã quản lý phòng ban khác');
+
+    if (departmentWithThisHead) {
+      throw new BadRequestException('Email này đã là trưởng phòng của một phòng ban khác');
     }
-    return user;
+
+    const user = await this.userRepository.findOne({
+      where: {
+        email
+      },
+    });
+    if (user) {
+      throw new BadRequestException('Email này đã tồn tại trong hệ thống');
+    }
   }
 
   async checkTaxCode(taxCode: string): Promise<{ isAvailable: boolean; message: string }> {
@@ -178,15 +186,13 @@ export class DepartmentService implements IDepartmentService {
     const department = this.departmentRepository.create(createDto);
 
     if (createDto.headEmail?.trim()) {
-      const existingUser = await this.userRepository.findOne({
-        where: { email: createDto.headEmail.trim() },
-      });
+      const headEmail = createDto.headEmail.trim();
 
-      if (existingUser) {
-        throw new BadRequestException('Email này đã tồn tại trong hệ thống người dùng');
-      }
+      // Gọi hàm kiểm tra hợp lệ
+      await this.checkUserCanBeHead(headEmail);
 
-      department.headEmail = createDto.headEmail.trim();
+      // Nếu không bị throw exception, thì gán
+      department.headEmail = headEmail;
     }
 
     const savedDepartment = await this.departmentRepository.save(department);
