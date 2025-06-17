@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuards, Inject, Patch, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuards, Inject, Patch, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateReportPeriodDto } from '@shared/dtos/report/create-report-period.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
@@ -76,6 +76,13 @@ export class ReportPeriodController {
   })
   async deleteMany(@Body('ids') ids: string[]): Promise<void> {
     return this.reportPeriodService.deleteMany(ids);
+  }
+
+  @Get('check-year')
+  @ApiOperation({ summary: 'Kiểm tra năm báo cáo đã tồn tại chưa' })
+  async checkReportPeriodYear(@Query('year') year: number): Promise<{ exists: boolean }> {
+    const exists = await this.reportPeriodService.checkYearExists(year);
+    return { exists };
   }
 
 

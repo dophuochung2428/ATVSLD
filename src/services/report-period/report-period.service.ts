@@ -37,6 +37,13 @@ export class ReportPeriodService implements IReportPeriodService {
         await queryRunner.startTransaction();
 
         try {
+            const existing = await queryRunner.manager.findOne(ReportPeriod, {
+                where: { year: dto.year },
+            });
+            if (existing) {
+                throw new BadRequestException(`Đã tồn tại kỳ báo cáo cho năm ${dto.year}`);
+            }
+
             if (!dto.startDate || isNaN(new Date(dto.startDate).getTime())) {
                 throw new BadRequestException('Ngày bắt đầu không hợp lệ');
             }
@@ -163,16 +170,22 @@ export class ReportPeriodService implements IReportPeriodService {
         Object.assign(period, fieldsToUpdate);
         const updatedPeriod = await this.repo.save(period);
 
-        if (dto.startDate && dto.endDate) {
-            const submittedCount = await this.reportRepo.count({
-                where: {
-                    reportPeriod: { id },
-                    state: Not(ReportState.Pending),
-                },
-            });
-            if (submittedCount > 0) {
-                throw new BadRequestException('Không thể thay đổi ngày nếu đã có báo cáo được nộp');
+        if (dto.startDate || dto.endDate) {
+            const now = new Date();
+            let newState: ReportState;
+
+            if (now < updatedPeriod.startDate) {
+                newState = ReportState.Pending;
+            } else if (now > updatedPeriod.endDate) {
+                newState = ReportState.Expired;
+            } else {
+                newState = ReportState.Pending;
             }
+
+            await this.reportRepo.update(
+                { reportPeriod: { id } },
+                { state: newState }
+            );
         }
         return updatedPeriod;
     }
@@ -194,7 +207,7 @@ export class ReportPeriodService implements IReportPeriodService {
         const currentDate = new Date();
         const periods = await this.repo
             .createQueryBuilder('period')
-            .where('period.startDate <= :currentDate', { currentDate })
+            .where('period.startDate <= :currentDate AND period.endDate >= :currentDate', { currentDate })
             .andWhere('period.active = :active', { active: true })
             .getMany();
 
@@ -217,6 +230,11 @@ export class ReportPeriodService implements IReportPeriodService {
         }
 
         await this.repo.delete(ids);
+    }
+
+    async checkYearExists(year: number): Promise<boolean> {
+        const found = await this.repo.findOne({ where: { year } });
+        return !!found;
     }
 
 }

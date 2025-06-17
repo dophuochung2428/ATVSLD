@@ -1,6 +1,7 @@
 import { Controller, Get, Inject, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/modules/auth/jwt.guard";
+import { Permissions } from "src/modules/auth/permissions.decorator";
 import { IPermissionService } from "src/services/permission/permission.service.interface";
 
 @ApiTags('Permission')
@@ -13,7 +14,7 @@ export class PermissionController {
         private readonly permissionService: IPermissionService,
     ) {}
 
-
+  @Permissions('ADMIN_C_PERMISSION_VIEW')
   @Get()
   @ApiOperation({ summary: 'Get permission' })
   async getGroupedPermissions() {
