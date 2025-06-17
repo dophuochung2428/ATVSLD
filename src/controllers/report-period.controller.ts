@@ -30,6 +30,19 @@ export class ReportPeriodController {
     return this.reportPeriodService.findAll();
   }
 
+  @Get('check-year')
+  @ApiOperation({ summary: 'Kiểm tra năm báo cáo đã tồn tại chưa' })
+  async checkReportPeriodYear(@Query('year') year: number): Promise<{ exists: boolean }> {
+    const exists = await this.reportPeriodService.checkYearExists(year);
+    return { exists };
+  }
+
+  @Get('active-years')
+  @ApiOperation({ summary: 'Lấy danh sách các năm của kỳ báo cáo đang hoạt động' })
+  async getActiveYears(): Promise<number[]> {
+    return this.reportPeriodService.getActiveYears();
+  }
+
   @Permissions('ADMIN_C_REPORT_VIEW')
   @Get(':id')
   @ApiOperation({ summary: 'Lấy chi tiết kỳ báo cáo' })
@@ -77,20 +90,5 @@ export class ReportPeriodController {
   async deleteMany(@Body('ids') ids: string[]): Promise<void> {
     return this.reportPeriodService.deleteMany(ids);
   }
-
-  @Get('check-year')
-  @ApiOperation({ summary: 'Kiểm tra năm báo cáo đã tồn tại chưa' })
-  async checkReportPeriodYear(@Query('year') year: number): Promise<{ exists: boolean }> {
-    const exists = await this.reportPeriodService.checkYearExists(year);
-    return { exists };
-  }
-
-  @Get('active-years')
-  @ApiOperation({ summary: 'Lấy danh sách các năm của kỳ báo cáo đang hoạt động' })
-  async getActiveYears(): Promise<number[]> {
-    return this.reportPeriodService.getActiveYears();
-  }
-
-
 
 }
