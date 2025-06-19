@@ -138,6 +138,11 @@ export class DepartmentService implements IDepartmentService {
       operationCity,
       operationDistrict,
       operationWard,
+      business_file: department.businessFiles.map(file => ({
+        id: file.id,
+        name: file.name,
+        url: file.url
+      }))
     };
 
     return rawData;

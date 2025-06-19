@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuards, Inject, Patch, HttpCode, HttpStatus, Query, Res } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
 import { JwtAuthGuard } from 'src/modules/auth/jwt.guard';
@@ -7,7 +7,7 @@ import { Permissions } from 'src/modules/auth/permissions.decorator';
 import { ExportReportService } from 'src/services/report-period/export-report.service';
 import { IReportService } from 'src/services/report-period/report-period.service.interface';
 import { getReportExportData } from '../utils/report-export.util';
-import rawRegions from 'src/data/regions.json'; 
+import rawRegions from 'src/data/regions.json';
 import { flattenRegions } from '../utils/flatten-regions.util';
 import { Response } from 'express';
 
@@ -90,6 +90,15 @@ export class ReportController {
     }
 
     @Get(':id/preview')
+    @ApiProduces('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    @ApiResponse({
+        status: 200,
+        description: 'Export report as Word document',
+        schema: {
+            type: 'string',
+            format: 'binary',
+        },
+    })
     async previewReport(@Param('id') reportId: string, @Res() res: Response) {
         const regions = flattenRegions(rawRegions);
         const report = await this.reportService.findByIdWithRelations(reportId);
