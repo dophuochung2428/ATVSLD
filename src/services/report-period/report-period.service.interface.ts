@@ -3,6 +3,7 @@ import { CreateReportDto } from '@shared/dtos/report/create-report.dto';
 import { ReportPeriodResponseDto } from '@shared/dtos/report/report-period-response.dto';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
+import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
 import { ReportPeriod } from 'src/entities/report-period.entity';
 import { Report } from 'src/entities/report.entity';
 
@@ -24,4 +25,23 @@ export interface IReportService {
   getReportsByPeriodYear(departmentId: string, year: number): Promise<ReportResponseDto[]>
   createReport(dto: CreateReportDto): Promise<Report>
   markReportsAsExpired(): Promise<void>
+  updateReportInfos(reportId: string, dto: UpdateReportInfosDto, userId: string, markComplete?: boolean): Promise<void>
+  startTyping(reportId: string, userId: string): Promise<void>
+  findByIdWithRelations(reportId: string): Promise<Report>
 }
+
+export type ExportFieldValue = string | number | undefined;
+export interface ExportReportDataBase  {
+  yearOfPeriod?: ExportFieldValue;
+  nameOfDepartment?: ExportFieldValue;
+  businessIndustryCode?: ExportFieldValue;
+  businessTypeName?: ExportFieldValue;
+  address?: ExportFieldValue;
+  phone?: ExportFieldValue;
+}
+
+export type ExportReportData = ExportReportDataBase & {
+  [key: `a${number}`]: ExportFieldValue;
+};
+
+export type RegionsMap = Record<string, { name: string }>;

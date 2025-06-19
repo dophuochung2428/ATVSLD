@@ -6,10 +6,10 @@ export class EnvironmentalMonitoring {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ type: 'int', default: 0 })
+    @Column({ type: 'int', nullable: true })
     totalSamples: number; // Số mẫu quan trắc môi trường (mẫu)
 
-    @Column({ type: 'int', default: 0 })
+    @Column({ type: 'int', nullable: true })
     samplesNotStandard: number; // Số mẫu không đạt tiêu chuẩn
 
     @Column({ type: 'varchar', nullable: true })

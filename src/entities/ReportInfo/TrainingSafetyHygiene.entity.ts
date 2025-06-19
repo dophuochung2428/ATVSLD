@@ -31,7 +31,7 @@ export class TrainingSafetyHygiene {
     @Column({ type: 'varchar', nullable: true })
     hireTrainer: string;
 
-    @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
     totalTrainingCost: number; // Tổng chi phí huấn luyện (triệu đồng)
 
     @OneToOne(() => Report, (report) => report.trainingSafetyHygienes, { onDelete: 'CASCADE' })

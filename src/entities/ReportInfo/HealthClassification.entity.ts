@@ -6,19 +6,19 @@ export class HealthClassification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', nullable: true })
   typeI: number; // Loại I (Người)
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', nullable: true })
   typeII: number; // Loại II (Người)
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', nullable: true })
   typeIII: number; // Loại III (Người)
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', nullable: true })
   typeIV: number; // Loại IV (Người)
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', nullable: true })
   typeV: number; // Loại V (Người)
 
   @OneToOne(() => Report, (report) => report.healthClassifications, { onDelete: 'CASCADE' })

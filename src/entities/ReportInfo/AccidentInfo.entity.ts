@@ -7,22 +7,22 @@ export class AccidentInfo {
   id: string;
 
   // Tổng số vụ tai nạn lao động
-  @Column()
+  @Column({nullable: true})
   totalAccidents: number;
 // Số người chết vì TNLD
-  @Column()
+  @Column({nullable: true})
   deaths: number;
 // Số vụ có người chết
-  @Column()
+  @Column({nullable: true})
   numberOfFatalIncidents: number;
 // Tổng chi phí cho TNLD
-  @Column()
+  @Column({nullable: true})
   totalCost: number;
 // Số người bị TNLD
-  @Column()
+  @Column({nullable: true})
   totalInjured: number;
 // Số ngày công vì TNLD
-  @Column()
+  @Column({nullable: true})
   lostWorkDays: number;
 
   @OneToOne(() => Report, (report) => report.accidentInfos, { onDelete: 'CASCADE' })

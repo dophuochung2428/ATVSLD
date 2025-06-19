@@ -116,7 +116,31 @@ export class DepartmentService implements IDepartmentService {
     if (!department) {
       throw new NotFoundException(`Department with ID ${id} not found`);
     }
-    return department;
+
+    const { city, district, ward } = await this.getRegionNames(
+      department.region_level1_id,
+      department.region_level2_id,
+      department.region_level3_id
+    );
+
+    const { city: operationCity, district: operationDistrict, ward: operationWard } =
+      await this.getRegionNames(
+        department.operation_region_level1_id,
+        department.operation_region_level2_id,
+        department.operation_region_level3_id
+      );
+    const rawData = {
+      ...department,
+      business_type_label: BusinessTypeLabels[department.business_type],
+      city,
+      district,
+      ward,
+      operationCity,
+      operationDistrict,
+      operationWard,
+    };
+
+    return rawData;
   }
 
   async checkUserCanBeHead(email: string) {

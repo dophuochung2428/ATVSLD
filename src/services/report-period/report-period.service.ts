@@ -13,6 +13,9 @@ import { PeriodLabel } from 'src/enums/period.enum';
 import { ReportNameLabel } from 'src/enums/reportName.enum';
 import { ReportPeriodResponseDto } from '@shared/dtos/report/report-period-response.dto';
 import { CreateReportDto } from '@shared/dtos/report/create-report.dto';
+import { createEmptyInfos } from 'src/utils/report-info.factory';
+import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
+import { User } from 'src/entities/user.entity';
 
 
 @Injectable()
@@ -77,18 +80,21 @@ export class ReportPeriodService implements IReportPeriodService {
             const departments = await queryRunner.manager.find(Department);
 
             // Tạo danh sách báo cáo
-            const reports = departments.map((dept) =>
-                queryRunner.manager.create(Report, {
+            const reports: Report[] = [];
+            for (const dept of departments) {
+                const report = queryRunner.manager.create(Report, {
                     department: dept,
-                    // startDate: savedPeriod.startDate,
-                    // endDate: savedPeriod.endDate,
-                    // period: savedPeriod.period,
                     updateDate: null,
                     state: ReportState.Pending,
                     reportPeriod: savedPeriod,
                     user: null,
-                }),
-            );
+                });
+
+                const emptyInfos = createEmptyInfos(queryRunner.manager);
+                Object.assign(report, emptyInfos);
+
+                reports.push(report);
+            }
 
             await queryRunner.manager.save(Report, reports);
 
@@ -266,6 +272,11 @@ export class ReportService implements IReportService {
         @InjectRepository(Department)
         private readonly departmentRepo: Repository<Department>,
 
+        @InjectRepository(User)
+        private readonly userRepo: Repository<User>,
+
+        private readonly dataSource: DataSource,
+
     ) { }
 
     async getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]> {
@@ -358,6 +369,9 @@ export class ReportService implements IReportService {
 
         });
 
+        const emptyInfos = createEmptyInfos(this.dataSource.manager);
+        Object.assign(report, emptyInfos);
+
         return this.reportRepo.save(report);
     }
 
@@ -391,5 +405,156 @@ export class ReportService implements IReportService {
             await this.reportRepo.save(targetReports);
         }
     }
+
+    async updateReportInfos(
+        reportId: string,
+        dto: UpdateReportInfosDto,
+        userId: string,
+        markComplete: boolean = false,
+    ): Promise<void> {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const report = await queryRunner.manager.findOne(Report, {
+                where: { id: reportId },
+                relations: [
+                    'accidentInfos',
+                    'environmentalMonitorings',
+                    'equipmentInspections',
+                    'healthClassifications',
+                    'laborInfos',
+                    'occupationalDiseases',
+                    'riskAssessmentSchedules',
+                    'safetyPlanImplementations',
+                    'serviceProviders',
+                    'toxicAllowances',
+                    'trainingSafetyHygienes',
+                    'workingTimes',
+                ],
+            });
+
+            if (!report) throw new NotFoundException('Không tìm thấy báo cáo');
+
+            if ([ReportState.Completed, ReportState.Expired].includes(report.state)) {
+                throw new BadRequestException('Không thể cập nhật báo cáo đã hoàn thành hoặc đã hết hạn');
+            }
+
+            const now = new Date();
+            if (report.reportPeriod.startDate && report.reportPeriod.endDate) {
+                if (now < report.reportPeriod.startDate || now > report.reportPeriod.endDate) {
+                    throw new BadRequestException('Chỉ được cập nhật trong thời gian báo cáo cho phép');
+                }
+            }
+
+            const user = await queryRunner.manager.findOne(User, { where: { id: userId } });
+            if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+
+            const updatePartial = <T>(entity: T, values: Partial<T>) => {
+                if (!entity || !values) return;
+                Object.entries(values).forEach(([key, value]) => {
+                    if (value !== undefined) {
+                        entity[key] = value;
+                    }
+                });
+            };
+
+            await updatePartial(report.accidentInfos, dto.accidentInfo);
+            await updatePartial(report.environmentalMonitorings, dto.environmentalMonitoring);
+            await updatePartial(report.equipmentInspections, dto.equipmentInspection);
+            await updatePartial(report.healthClassifications, dto.healthClassification);
+            await updatePartial(report.laborInfos, dto.laborInfo);
+            await updatePartial(report.occupationalDiseases, dto.occupationalDisease);
+            await updatePartial(report.riskAssessmentSchedules, dto.riskAssessmentSchedule);
+            await updatePartial(report.safetyPlanImplementations, dto.safetyPlanImplementation);
+            await updatePartial(report.serviceProviders, dto.serviceProvider);
+            await updatePartial(report.toxicAllowances, dto.toxicAllowance);
+            await updatePartial(report.trainingSafetyHygienes, dto.trainingSafetyHygiene);
+            await updatePartial(report.workingTimes, dto.workingTime);
+
+            report.user = user;
+            report.updateDate = new Date();
+
+            if (markComplete) {
+                report.state = ReportState.Completed;
+            }
+
+            await queryRunner.manager.save([
+                report.accidentInfos,
+                report.environmentalMonitorings,
+                report.equipmentInspections,
+                report.healthClassifications,
+                report.laborInfos,
+                report.occupationalDiseases,
+                report.riskAssessmentSchedules,
+                report.safetyPlanImplementations,
+                report.serviceProviders,
+                report.toxicAllowances,
+                report.trainingSafetyHygienes,
+                report.workingTimes,
+            ]);
+
+            await queryRunner.manager.save(report);
+
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    async startTyping(reportId: string, userId: string): Promise<void> {
+        const [report, user] = await Promise.all([
+            this.reportRepo.findOne({
+                where: { id: reportId },
+                relations: ['department'],
+            }),
+            this.userRepo.findOne({ where: { id: userId } }),
+        ]);
+
+        if (!report) throw new NotFoundException('Không tìm thấy báo cáo');
+        if (!user) throw new NotFoundException('Không tìm thấy người dùng');
+
+        if (report.state !== ReportState.Pending) return;
+
+        report.state = ReportState.Typing;
+        report.updateDate = new Date();
+        report.user = user;
+
+        await this.reportRepo.save(report);
+    }
+
+    async findByIdWithRelations(reportId: string): Promise<Report> {
+        const report = await this.reportRepo.findOne({
+            where: { id: reportId },
+            relations: [
+                'department',
+                'reportPeriod',
+                'user',
+                'accidentInfos',
+                'laborInfos',
+                'occupationalDiseases',
+                'healthClassifications',
+                'trainingSafetyHygienes',
+                'equipmentInspections',
+                'workingTimes',
+                'toxicAllowances',
+                'environmentalMonitorings',
+                'safetyPlanImplementations',
+                'serviceProviders',
+                'riskAssessmentSchedules',
+            ],
+        });
+
+        if (!report) {
+            throw new NotFoundException('Không tìm thấy báo cáo');
+        }
+
+        return report;
+    }
+
 }
 

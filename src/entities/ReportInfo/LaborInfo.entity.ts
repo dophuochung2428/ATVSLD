@@ -7,33 +7,33 @@ export class ReportLaborInfo {
     @PrimaryGeneratedColumn('uuid')
     id: string;
     // Tổng số lao động
-    @Column()
+    @Column({ type: 'int', nullable: true })
     totalWorkers: number;
     // Lao động nữ
-    @Column()
+    @Column({ type: 'int', nullable: true })
     femaleWorkers: number;
     // Lao động dưới 15 tuổi
-    @Column()
+    @Column({ type: 'int', nullable: true })
     under15: number;
 
     // Người làm công tác ATVSLD
-    @Column()
+    @Column({ type: 'int', nullable: true })
     implementerATVSLD: number;
     // Lao động trong điều kiện độc hại
-    @Column()
+    @Column({ type: 'int', nullable: true })
     workersInDangerousJob: number;
     // Lao động là người khuyết tật
-    @Column()
+    @Column({ type: 'int', nullable: true })
     workersWithDisability: number;
 
     // Người làm công tác y tế
-    @Column()
+    @Column({ type: 'int', nullable: true })
     healthWorker: number;
     // Lao động là người chưa thành niên
-    @Column()
+    @Column({ type: 'int', nullable: true })
     minorWorker: number
     // Lao động là người cao tuổi
-    @Column()
+    @Column({ type: 'int', nullable: true })
     elderlyWorkers: number;
 
 

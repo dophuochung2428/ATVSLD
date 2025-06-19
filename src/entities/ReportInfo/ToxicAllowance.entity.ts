@@ -6,10 +6,10 @@ export class ToxicAllowance {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', nullable: true })
   totalWorkersReceived: number; // Tổng số người
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   totalCost: number; // Tổng chi phí theo quy định tại điểm 10 (triệu đồng)
 
   @OneToOne(() => Report, (report) => report.toxicAllowances, { onDelete: 'CASCADE' })
