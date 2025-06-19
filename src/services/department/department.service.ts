@@ -369,18 +369,6 @@ export class DepartmentService implements IDepartmentService {
         throw new NotFoundException(`Không tìm thấy Department với id: ${id}`);
       }
 
-      // // Xử lý trưởng phòng cũ nếu thay đổi headEmail
-      // const trimmedHeadEmail = updateDto.headEmail?.trim();
-      // if (trimmedHeadEmail && // không null/undefined/rỗng
-      //   trimmedHeadEmail !== department.headEmail) {
-      //   const newHead = await this.checkUserCanBeHead(updateDto.headEmail);
-
-      //   // Gán user mới làm trưởng phòng
-      //   department.headEmail = newHead.email;
-      //   newHead.department = department;
-      //   await queryRunner.manager.save(newHead);
-      // }
-
       // Cập nhật các trường còn lại nếu có giá trị hợp lệ
       Object.entries(updateDto).forEach(([key, value]) => {
         if (
@@ -403,10 +391,27 @@ export class DepartmentService implements IDepartmentService {
         fieldName: 'business_license' | 'other_document',
         displayName: string
       ) => {
-        if (files?.[fieldName]?.length) {
+        const existingFile = department.businessFiles.find(f => f.name === displayName);
+        const fileArray = files?.[fieldName] ?? [];
+
+        if (fileArray.length === 0 && existingFile) {
+
           // Xóa file cũ nếu có
-          const oldFile = department.businessFiles.find(f => f.name === displayName);
-          const newFile = await this.updateSingleFile(queryRunner, files[fieldName][0], displayName, oldFile, department);
+          await this.cloudinaryService.deleteFile(existingFile.public_id);
+          await queryRunner.manager.delete(BusinessFile, existingFile.id);
+
+          department.businessFiles = department.businessFiles.filter(f => f.id !== existingFile.id);
+          return;
+        }
+        if (fileArray.length > 0) {
+          // 🔄 CẬP NHẬT file
+          const newFile = await this.updateSingleFile(
+            queryRunner,
+            fileArray[0],
+            displayName,
+            existingFile,
+            department
+          );
           newBusinessFiles.push(newFile);
         }
       };

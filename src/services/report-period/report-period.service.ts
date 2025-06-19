@@ -420,6 +420,7 @@ export class ReportService implements IReportService {
             const report = await queryRunner.manager.findOne(Report, {
                 where: { id: reportId },
                 relations: [
+                    'reportPeriod',
                     'accidentInfos',
                     'environmentalMonitorings',
                     'equipmentInspections',
@@ -480,7 +481,7 @@ export class ReportService implements IReportService {
                 report.state = ReportState.Completed;
             }
 
-            await queryRunner.manager.save([
+            const entitiesToSave = [
                 report.accidentInfos,
                 report.environmentalMonitorings,
                 report.equipmentInspections,
@@ -493,7 +494,25 @@ export class ReportService implements IReportService {
                 report.toxicAllowances,
                 report.trainingSafetyHygienes,
                 report.workingTimes,
-            ]);
+            ].filter(e => !!e);
+
+            for (const entity of entitiesToSave) {
+                await queryRunner.manager.save(entity);
+            }
+            // await queryRunner.manager.save([
+            //     report.accidentInfos,
+            //     report.environmentalMonitorings,
+            //     report.equipmentInspections,
+            //     report.healthClassifications,
+            //     report.laborInfos,
+            //     report.occupationalDiseases,
+            //     report.riskAssessmentSchedules,
+            //     report.safetyPlanImplementations,
+            //     report.serviceProviders,
+            //     report.toxicAllowances,
+            //     report.trainingSafetyHygienes,
+            //     report.workingTimes,
+            // ]);
 
             await queryRunner.manager.save(report);
 
@@ -555,6 +574,8 @@ export class ReportService implements IReportService {
 
         return report;
     }
+
+    
 
 }
 
