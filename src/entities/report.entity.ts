@@ -29,14 +29,17 @@ export class Report {
     })
     state: ReportState;
 
-    @ManyToOne(() => Department, department => department.reports)
+    @ManyToOne(() => Department, department => department.reports,
+        {
+            onDelete: 'CASCADE'
+        })
     @JoinColumn({ name: 'department_id' })
     department: Department;
 
     @Column({ type: 'date', nullable: true })
     updateDate: Date;
 
-    @ManyToOne(() => User, { nullable: true, eager: true })
+    @ManyToOne(() => User, { nullable: true, eager: true, onDelete: 'SET NULL', })
     @JoinColumn({ name: 'user_id' })
     user: User;
 

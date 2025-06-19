@@ -22,8 +22,12 @@ export function getValueFromPath(obj: unknown, path: string): unknown {
 export function cleanNulls(data: ExportReportData): ExportReportData {
   const result: ExportReportData = {};
   for (const key in data) {
-    const value = data[key as keyof ExportReportData];
-    result[key as keyof ExportReportData] = value ?? '';
+    let value = data[key as keyof ExportReportData];
+    if (value == null) value = '';
+    if (typeof value === 'string') {
+      value = value.replace(/[[\]<>&]/g, ''); // Loại bỏ ký tự nguy hiểm
+    }
+    result[key as keyof ExportReportData] = value;
   }
   return result;
 }

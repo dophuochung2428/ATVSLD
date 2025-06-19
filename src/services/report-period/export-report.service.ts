@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-// @ts-ignore
-const PizZip = require('pizzip');
-// @ts-ignore
-const Docxtemplater = require('docxtemplater');
-import { cloneDeep } from 'lodash';
+import mammoth from 'mammoth';
+import HTMLtoDOCX from 'html-to-docx';
 import { ExportReportData } from './report-period.service.interface';
 import { cleanNulls } from 'src/utils/report-export.util';
 
@@ -13,18 +10,20 @@ import { cleanNulls } from 'src/utils/report-export.util';
 export class ExportReportService {
   async exportReportWord(data: ExportReportData): Promise<Buffer> {
     const templatePath = path.resolve(process.cwd(), 'templates/atvsld-report.docx');
-    const content = fs.readFileSync(templatePath, 'binary');
-    const zip = new PizZip(content);
-    const doc = new Docxtemplater(zip, {
-      paragraphLoop: true,
-      linebreaks: true,
-    });
-
     const cleanData = cleanNulls(data);
+    console.log('Dữ liệu:', JSON.stringify(cleanData, null, 2));
 
-    doc.setData(cleanData);
-    doc.render();
+    // Đọc file Word thành HTML
+    const { value: html } = await mammoth.convertToHtml({ path: templatePath });
 
-    return doc.getZip().generate({ type: 'nodebuffer' });
+    // Thay thế placeholder [key] bằng giá trị
+    let modifiedHtml = html;
+    for (const key in cleanData) {
+      modifiedHtml = modifiedHtml.replace(`[${key}]`, String(cleanData[key] || ''));
+    }
+
+    // Chuyển HTML về DOCX
+    const buffer = await HTMLtoDOCX(modifiedHtml);
+    return buffer;
   }
 }
