@@ -119,8 +119,8 @@ export class DepartmentController {
     @Body() updateDto: UpdateDepartmentWithFilesDto,
     @UploadedFiles()
     files: {
-      business_license?: Express.Multer.File[],
-      other_document?: Express.Multer.File[],
+      business_license?: (Express.Multer.File | string)[],
+      other_document?: (Express.Multer.File | string)[],
     },
   ) {
     // return this.departmentService.update(id, updateDto, files);

@@ -19,6 +19,7 @@ import { BusinessType } from 'src/enums/businessType.enum';
 import { IReportPeriodService, IReportService } from '../report-period/report-period.service.interface';
 import { ReportState } from 'src/enums/report-state.enum';
 import { Report } from 'src/entities/report.entity';
+import { UpdateDepartmentWithFilesDto } from '@shared/dtos/department/update-department-with-files.dto';
 
 
 @Injectable()
@@ -349,10 +350,10 @@ export class DepartmentService implements IDepartmentService {
     });
   }
 
-  async update(id: string, updateDto: UpdateDepartmentDto,
+  async update(id: string, updateDto: UpdateDepartmentWithFilesDto,
     files?: {
-      business_license?: Express.Multer.File[],
-      other_document?: Express.Multer.File[],
+      business_license?: (Express.Multer.File | string)[],
+      other_document?: (Express.Multer.File | string)[],
     },
   ): Promise<Department> {
     const queryRunner = this.dataSource.createQueryRunner();
@@ -385,7 +386,11 @@ export class DepartmentService implements IDepartmentService {
       await queryRunner.manager.save(department);
 
       // Xử lý file (xóa cũ, upload mới)
-      const newBusinessFiles = [];
+      const newBusinessFiles: BusinessFile[] = [];
+
+      const isUploadedFile = (file: unknown): file is Express.Multer.File => {
+        return typeof file === 'object' && file !== null && 'originalname' in file;
+      };
 
       const handleFileUpdate = async (
         fieldName: 'business_license' | 'other_document',
@@ -394,7 +399,10 @@ export class DepartmentService implements IDepartmentService {
         const existingFile = department.businessFiles.find(f => f.name === displayName);
         const fileArray = files?.[fieldName] ?? [];
 
-        if (fileArray.length === 0 && existingFile) {
+        const urlField = `${fieldName}_url` as keyof UpdateDepartmentWithFilesDto;
+        const keepUrl = updateDto[urlField];
+
+        if (fileArray.length === 0 && !keepUrl && existingFile) {
 
           // Xóa file cũ nếu có
           await this.cloudinaryService.deleteFile(existingFile.public_id);
@@ -403,8 +411,12 @@ export class DepartmentService implements IDepartmentService {
           department.businessFiles = department.businessFiles.filter(f => f.id !== existingFile.id);
           return;
         }
-        if (fileArray.length > 0) {
-          // 🔄 CẬP NHẬT file
+
+        if (keepUrl) {
+          return;
+        }
+
+        if (fileArray.length > 0 && isUploadedFile(fileArray[0])) {
           const newFile = await this.updateSingleFile(
             queryRunner,
             fileArray[0],

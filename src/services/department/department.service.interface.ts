@@ -19,12 +19,10 @@ export interface IDepartmentService {
   toggleStatus(id: string): Promise<void>
   deleteOne(id: string): Promise<void>
   deleteMany(ids: string[]): Promise<{ deleted: number }>
-  update(
-    id: string,
-    updateDto: UpdateDepartmentDto,
+  update(id: string, updateDto: UpdateDepartmentDto,
     files?: {
-      business_license?: Express.Multer.File[],
-      other_document?: Express.Multer.File[],
+      business_license?: (Express.Multer.File | string)[],
+      other_document?: (Express.Multer.File | string)[],
     },
   ): Promise<Department>
   exportToExcel(ids: string[], res: Response): Promise<void>
