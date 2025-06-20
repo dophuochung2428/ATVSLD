@@ -5,12 +5,13 @@ import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto'
 import { JwtAuthGuard } from 'src/modules/auth/jwt.guard';
 import { Permissions } from 'src/modules/auth/permissions.decorator';
 import { ExportReportService } from 'src/services/report-period/export-report.service';
-import { IReportService } from 'src/services/report-period/report-period.service.interface';
+import { ExportReportData, IReportService } from 'src/services/report-period/report-period.service.interface';
 import { getReportExportData } from '../utils/report-export.util';
 import rawRegions from 'src/data/regions.json';
 import { flattenRegions } from '../utils/flatten-regions.util';
 import { Response } from 'express';
 import { StreamableFile } from '@nestjs/common';
+import { ExportReportDynamicFieldsDto } from '@shared/dtos/report/ExportReportDynamicFields.dto';
 
 
 @ApiTags('Report(Báo cáo của doanh nghiệp)')
@@ -108,21 +109,19 @@ export class ReportController {
     })
     async previewReport(@Param('id', ParseUUIDPipe) reportId: string): Promise<StreamableFile> {
         try {
-            console.log(`Bắt đầu xử lý preview cho report ID: ${reportId}`);
             const regions = flattenRegions(rawRegions);
             const report = await this.reportService.findByIdWithRelations(reportId);
             if (!report) {
-                console.log(`Không tìm thấy báo cáo với ID: ${reportId}`);
                 throw new NotFoundException(`Không tìm thấy báo cáo với ID ${reportId}`);
             }
+
             const data = getReportExportData(report, regions);
             const buffer = await this.exportReportService.exportReportWord(data);
-            console.log(`Buffer được tạo, kích thước: ${buffer.length} bytes`);
+
             if (!(buffer instanceof Buffer) || buffer.length === 0) {
-                console.error('Lỗi: Buffer không hợp lệ hoặc rỗng');
                 throw new HttpException('Buffer không hợp lệ', HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            console.log(`Đang trả về StreamableFile cho report ID: ${reportId}`);
+
             return new StreamableFile(buffer, {
                 type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 disposition: `attachment; filename=report-${reportId}.docx`,
@@ -140,6 +139,50 @@ export class ReportController {
             throw new HttpException('Lỗi máy chủ nội bộ', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Post(':id/preview-from-input')
+    @ApiOperation({ summary: 'Xuất báo cáo Word từ dữ liệu người dùng nhập (dùng StreamableFile)' })
+    @ApiProduces('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    @ApiParam({ name: 'id', description: 'ID của báo cáo' })
+    @ApiBody({ type: ExportReportDynamicFieldsDto })
+    @ApiResponse({
+        status: 200,
+        description: 'Xuất file Word preview từ dữ liệu người dùng nhập',
+        schema: { type: 'string', format: 'binary' },
+    })
+    async previewFromUserInput(
+        @Param('id', ParseUUIDPipe) reportId: string,
+        @Body() userInput: ExportReportDynamicFieldsDto,
+    ): Promise<StreamableFile> {
+        try {
+            const report = await this.reportService.findByIdWithRelations(reportId);
+            if (!report) throw new NotFoundException(`Không tìm thấy báo cáo với ID ${reportId}`);
+
+            const regions = flattenRegions(rawRegions);
+            const defaultData = getReportExportData(report, regions);
+
+            const mergedData: ExportReportData = {
+                ...defaultData,
+                ...userInput,
+            };
+
+            const buffer = await this.exportReportService.exportReportWord(mergedData);
+
+            if (!buffer?.length) {
+                throw new HttpException('Không thể tạo file Word', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            return new StreamableFile(buffer, {
+                type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                disposition: `attachment; filename=report-preview-${reportId}.docx`,
+            });
+        } catch (error) {
+            console.error('Lỗi khi tạo Word từ input:', error);
+            throw new HttpException('Không thể tạo file Word', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
     @Get(':id')
     @ApiParam({ name: 'id', description: 'ID của báo cáo' })

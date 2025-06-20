@@ -31,7 +31,7 @@ export interface IReportService {
 }
 
 export type ExportFieldValue = string | number | undefined;
-export interface ExportReportDataBase  {
+export interface ExportReportDataBase {
   yearOfPeriod?: ExportFieldValue;
   nameOfDepartment?: ExportFieldValue;
   businessIndustryCode?: ExportFieldValue;
@@ -41,7 +41,20 @@ export interface ExportReportDataBase  {
 }
 
 export type ExportReportData = ExportReportDataBase & {
-  [key: `a${number}`]: ExportFieldValue;
+  [key in
+  | `a${number}`
+  | `b${number}`
+  | `c${number}`
+  | `d${number}`
+  | `e${number}`
+  | `f${number}`
+  | `g${number}`
+  | `h${number}`
+  | `i${number}`
+  | `k${number}`
+  | `l${number}`
+  | `m${number}`
+  ]?: ExportFieldValue;
 };
 
 export type RegionsMap = Record<string, { name: string }>;
