@@ -352,8 +352,8 @@ export class DepartmentService implements IDepartmentService {
 
   async update(id: string, updateDto: UpdateDepartmentWithFilesDto,
     files?: {
-      business_license?: (Express.Multer.File | string)[],
-      other_document?: (Express.Multer.File | string)[],
+      business_license?: Express.Multer.File[],
+      other_document?: Express.Multer.File[],
     },
   ): Promise<Department> {
     const queryRunner = this.dataSource.createQueryRunner();
