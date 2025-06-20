@@ -5,20 +5,32 @@ import { IsOptional, IsString } from 'class-validator';
 export class UpdateDepartmentWithFilesDto extends UpdateDepartmentDto {
   @ApiProperty({
     type: 'string',
+    format: 'binary',
     required: false,
-    description: 'URL của file giấy phép kinh doanh nếu muốn giữ nguyên',
+    description: 'File giấy phép kinh doanh (upload mới)',
   })
-  @IsOptional()
-  @IsString()
-  business_license_url?: string;
+  business_license?: string;
 
   @ApiProperty({
     type: 'string',
     required: false,
-    description: 'URL của file tài liệu khác nếu muốn giữ nguyên',
+    description: 'URL để giữ nguyên giấy phép kinh doanh',
   })
-  @IsOptional()
-  @IsString()
+  business_license_url?: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'File giấy tờ khác (upload mới)',
+  })
+  other_document?: string;
+
+  @ApiProperty({
+    type: 'string',
+    required: false,
+    description: 'URL để giữ nguyên giấy tờ khác',
+  })
   other_document_url?: string;
 }
 
