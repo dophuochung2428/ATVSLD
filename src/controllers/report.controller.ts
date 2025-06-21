@@ -182,14 +182,11 @@ export class ReportController {
         }
     }
 
-
-
     @Get(':id')
     @ApiParam({ name: 'id', description: 'ID của báo cáo' })
     @ApiOperation({ summary: 'Lấy chi tiết báo cáo' })
     async getReportDetail(@Param('id', ParseUUIDPipe) id: string) {
         return this.reportService.findByIdWithRelations(id);
     }
-
 
 }
