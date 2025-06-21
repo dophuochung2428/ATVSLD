@@ -9,7 +9,7 @@ export class Department {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, nullable: true })
   name: string;
 
   @Column({ nullable: true, unique: true })
