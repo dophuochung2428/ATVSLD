@@ -8,10 +8,12 @@ import { Report } from 'src/entities/report.entity';
 import { User } from 'src/entities/user.entity';
 import { ExportReportService } from 'src/services/report-period/export-report.service';
 import { ReportPeriodService, ReportService } from 'src/services/report-period/report-period.service';
+import { RegionModule } from '../region/region.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ReportPeriod, Report, Department, User])
+  imports: [TypeOrmModule.forFeature([ReportPeriod, Report, Department, User]),
+  RegionModule,
 ],
   controllers: [ReportPeriodController, ReportController],
   providers: [
