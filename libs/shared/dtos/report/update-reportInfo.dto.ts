@@ -108,16 +108,16 @@ export class WorkingTimeDto {
 }
 
 export class UpdateReportInfosDto {
-  @Type(() => AccidentInfoDto) @ApiPropertyOptional({ type: AccidentInfoDto }) accidentInfo?: AccidentInfoDto;
-  @Type(() => EnvironmentalMonitoringDto) @ApiPropertyOptional({ type: EnvironmentalMonitoringDto }) environmentalMonitoring?: EnvironmentalMonitoringDto;
-  @Type(() => EquipmentInspectionDto) @ApiPropertyOptional({ type: EquipmentInspectionDto }) equipmentInspection?: EquipmentInspectionDto;
-  @Type(() => HealthClassificationDto) @ApiPropertyOptional({ type: HealthClassificationDto }) healthClassification?: HealthClassificationDto;
-  @Type(() => ReportLaborInfoDto) @ApiPropertyOptional({ type: ReportLaborInfoDto }) laborInfo?: ReportLaborInfoDto;
-  @Type(() => OccupationalDiseaseDto) @ApiPropertyOptional({ type: OccupationalDiseaseDto }) occupationalDisease?: OccupationalDiseaseDto;
-  @Type(() => RiskAssessmentScheduleDto) @ApiPropertyOptional({ type: RiskAssessmentScheduleDto }) riskAssessmentSchedule?: RiskAssessmentScheduleDto;
-  @Type(() => SafetyPlanImplementationDto) @ApiPropertyOptional({ type: SafetyPlanImplementationDto }) safetyPlanImplementation?: SafetyPlanImplementationDto;
-  @Type(() => ServiceProviderDto) @ApiPropertyOptional({ type: ServiceProviderDto }) serviceProvider?: ServiceProviderDto;
-  @Type(() => ToxicAllowanceDto) @ApiPropertyOptional({ type: ToxicAllowanceDto }) toxicAllowance?: ToxicAllowanceDto;
-  @Type(() => TrainingSafetyHygieneDto) @ApiPropertyOptional({ type: TrainingSafetyHygieneDto }) trainingSafetyHygiene?: TrainingSafetyHygieneDto;
-  @Type(() => WorkingTimeDto) @ApiPropertyOptional({ type: WorkingTimeDto }) workingTime?: WorkingTimeDto;
+  @Type(() => AccidentInfoDto) @ApiPropertyOptional({ type: AccidentInfoDto }) accidentInfos?: AccidentInfoDto;
+  @Type(() => EnvironmentalMonitoringDto) @ApiPropertyOptional({ type: EnvironmentalMonitoringDto }) environmentalMonitorings?: EnvironmentalMonitoringDto;
+  @Type(() => EquipmentInspectionDto) @ApiPropertyOptional({ type: EquipmentInspectionDto }) equipmentInspections?: EquipmentInspectionDto;
+  @Type(() => HealthClassificationDto) @ApiPropertyOptional({ type: HealthClassificationDto }) healthClassifications?: HealthClassificationDto;
+  @Type(() => ReportLaborInfoDto) @ApiPropertyOptional({ type: ReportLaborInfoDto }) laborInfos?: ReportLaborInfoDto;
+  @Type(() => OccupationalDiseaseDto) @ApiPropertyOptional({ type: OccupationalDiseaseDto }) occupationalDiseases?: OccupationalDiseaseDto;
+  @Type(() => RiskAssessmentScheduleDto) @ApiPropertyOptional({ type: RiskAssessmentScheduleDto }) riskAssessmentSchedules?: RiskAssessmentScheduleDto;
+  @Type(() => SafetyPlanImplementationDto) @ApiPropertyOptional({ type: SafetyPlanImplementationDto }) safetyPlanImplementations?: SafetyPlanImplementationDto;
+  @Type(() => ServiceProviderDto) @ApiPropertyOptional({ type: ServiceProviderDto }) serviceProviders?: ServiceProviderDto;
+  @Type(() => ToxicAllowanceDto) @ApiPropertyOptional({ type: ToxicAllowanceDto }) toxicAllowances?: ToxicAllowanceDto;
+  @Type(() => TrainingSafetyHygieneDto) @ApiPropertyOptional({ type: TrainingSafetyHygieneDto }) trainingSafetyHygienes?: TrainingSafetyHygieneDto;
+  @Type(() => WorkingTimeDto) @ApiPropertyOptional({ type: WorkingTimeDto }) workingTimes?: WorkingTimeDto;
 }

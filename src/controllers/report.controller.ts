@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuards, Inject, Patch, HttpCode, HttpStatus, Query, Res, NotFoundException, HttpException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, ParseUUIDPipe, UseGuards, Inject, Patch, HttpCode, HttpStatus, Query, Res, NotFoundException, HttpException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
 import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
@@ -12,6 +12,7 @@ import { flattenRegions } from '../utils/flatten-regions.util';
 import { Response } from 'express';
 import { StreamableFile } from '@nestjs/common';
 import { ExportReportDynamicFieldsDto } from '@shared/dtos/report/ExportReportDynamicFields.dto';
+import { ConfigService } from '@nestjs/config';
 
 
 @ApiTags('Report(Báo cáo của doanh nghiệp)')
@@ -24,6 +25,8 @@ export class ReportController {
         private readonly reportService: IReportService,
 
         private readonly exportReportService: ExportReportService,
+
+        private readonly configService: ConfigService,
     ) { }
 
     @Permissions('USER_C_REPORT_VIEW')
@@ -45,13 +48,21 @@ export class ReportController {
         return this.reportService.getReportsByPeriodYear(departmentId, Number(year));
     }
 
+    @UseGuards()
     @Post('cron/expire-reports')
     @HttpCode(200)
-    async expirePendingReports() {
+    async expirePendingReports(@Query('secret') secret: string) {
+        const expectedSecret = this.configService.get<string>('CRON_SECRET');
+
+        if (!secret || secret !== expectedSecret) {
+            throw new UnauthorizedException('Invalid secret key');
+        }
+
         await this.reportService.markReportsAsExpired();
         return { message: 'Đã kiểm tra và chuyển trạng thái báo cáo quá hạn.' };
     }
 
+    @Permissions('USER_C_REPORT_UPDATE')
     @Put(':id/infos')
     @ApiOperation({ summary: 'Cập nhật báo cáo( Báo cáo)' })
 
@@ -63,6 +74,7 @@ export class ReportController {
         await this.reportService.updateReportInfos(id, dto, userId);
     }
 
+    @Permissions('USER_C_REPORT_UPDATE')
     @Put(':id/complete')
     @ApiOperation({ summary: 'Hoàn thành' })
 
@@ -75,7 +87,7 @@ export class ReportController {
     }
 
 
-
+    @Permissions('USER_C_REPORT_UPDATE')
     @Patch(':id/start-typing')
     @ApiOperation({ summary: 'Bắt đầu chỉnh sửa báo cáo (chuyển trạng thái từ Pending sang Typing)' })
     @ApiParam({ name: 'id', description: 'ID của báo cáo' })
@@ -95,10 +107,10 @@ export class ReportController {
         await this.reportService.startTyping(reportId, userId);
     }
 
+    @Permissions('USER_C_REPORT_VIEW')
     @Get(':id/preview')
     @ApiProduces('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     @ApiOperation({ summary: 'Tạo báo cáo bản word' })
-
     @ApiResponse({
         status: 200,
         description: 'Export report as Word document',
@@ -140,6 +152,7 @@ export class ReportController {
         }
     }
 
+    @Permissions('USER_C_REPORT_VIEW')
     @Post(':id/preview-from-input')
     @ApiOperation({ summary: 'Xuất báo cáo Word từ dữ liệu người dùng nhập (dùng StreamableFile)' })
     @ApiProduces('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
@@ -182,6 +195,7 @@ export class ReportController {
         }
     }
 
+    @Permissions('USER_C_REPORT_VIEW')
     @Get(':id')
     @ApiParam({ name: 'id', description: 'ID của báo cáo' })
     @ApiOperation({ summary: 'Lấy chi tiết báo cáo' })

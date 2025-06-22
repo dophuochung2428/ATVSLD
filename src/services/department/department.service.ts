@@ -293,6 +293,17 @@ export class DepartmentService implements IDepartmentService {
       throw new NotFoundException(`Không tìm thấy đơn vị với ID ${id}`);
     }
 
+
+    const userCount = await this.userRepository.count({
+      where: { department: { id } },
+    });
+
+    if (userCount > 0) {
+      throw new BadRequestException(
+        `Không thể xoá đơn vị vì đang có ${userCount} người dùng liên kết`
+      );
+    }
+
     for (const file of department.businessFiles) {
       if (file.public_id) {
         await this.deleteCloudinaryFile(file.public_id);
@@ -313,6 +324,20 @@ export class DepartmentService implements IDepartmentService {
 
     if (departments.length === 0) {
       throw new NotFoundException('Không tìm thấy bất kỳ đơn vị nào');
+    }
+
+    const departmentsWithUsers = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.department_id', 'departmentId')
+      .where('user.department_id IN (:...ids)', { ids })
+      .groupBy('user.department_id')
+      .getRawMany();
+
+    if (departmentsWithUsers.length > 0) {
+      const busyIds = departmentsWithUsers.map((row) => row.departmentId);
+      throw new BadRequestException(
+        `Không thể xoá các đơn vị đang có người dùng: ${busyIds.join(', ')}`
+      );
     }
 
     for (const dept of departments) {

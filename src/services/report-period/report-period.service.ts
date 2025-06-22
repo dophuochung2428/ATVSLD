@@ -471,18 +471,18 @@ export class ReportService implements IReportService {
                 });
             };
 
-            await updatePartial(report.accidentInfos, dto.accidentInfo);
-            await updatePartial(report.environmentalMonitorings, dto.environmentalMonitoring);
-            await updatePartial(report.equipmentInspections, dto.equipmentInspection);
-            await updatePartial(report.healthClassifications, dto.healthClassification);
-            await updatePartial(report.laborInfos, dto.laborInfo);
-            await updatePartial(report.occupationalDiseases, dto.occupationalDisease);
-            await updatePartial(report.riskAssessmentSchedules, dto.riskAssessmentSchedule);
-            await updatePartial(report.safetyPlanImplementations, dto.safetyPlanImplementation);
-            await updatePartial(report.serviceProviders, dto.serviceProvider);
-            await updatePartial(report.toxicAllowances, dto.toxicAllowance);
-            await updatePartial(report.trainingSafetyHygienes, dto.trainingSafetyHygiene);
-            await updatePartial(report.workingTimes, dto.workingTime);
+            await updatePartial(report.accidentInfos, dto.accidentInfos);
+            await updatePartial(report.environmentalMonitorings, dto.environmentalMonitorings);
+            await updatePartial(report.equipmentInspections, dto.equipmentInspections);
+            await updatePartial(report.healthClassifications, dto.healthClassifications);
+            await updatePartial(report.laborInfos, dto.laborInfos);
+            await updatePartial(report.occupationalDiseases, dto.occupationalDiseases);
+            await updatePartial(report.riskAssessmentSchedules, dto.riskAssessmentSchedules);
+            await updatePartial(report.safetyPlanImplementations, dto.safetyPlanImplementations);
+            await updatePartial(report.serviceProviders, dto.serviceProviders);
+            await updatePartial(report.toxicAllowances, dto.toxicAllowances);
+            await updatePartial(report.trainingSafetyHygienes, dto.trainingSafetyHygienes);
+            await updatePartial(report.workingTimes, dto.workingTimes);
 
             report.user = user;
             report.updateDate = new Date();
@@ -509,20 +509,6 @@ export class ReportService implements IReportService {
             for (const entity of entitiesToSave) {
                 await queryRunner.manager.save(entity);
             }
-            // await queryRunner.manager.save([
-            //     report.accidentInfos,
-            //     report.environmentalMonitorings,
-            //     report.equipmentInspections,
-            //     report.healthClassifications,
-            //     report.laborInfos,
-            //     report.occupationalDiseases,
-            //     report.riskAssessmentSchedules,
-            //     report.safetyPlanImplementations,
-            //     report.serviceProviders,
-            //     report.toxicAllowances,
-            //     report.trainingSafetyHygienes,
-            //     report.workingTimes,
-            // ]);
 
             await queryRunner.manager.save(report);
 
