@@ -13,6 +13,7 @@ import { Response } from 'express';
 import { StreamableFile } from '@nestjs/common';
 import { ExportReportDynamicFieldsDto } from '@shared/dtos/report/ExportReportDynamicFields.dto';
 import { ConfigService } from '@nestjs/config';
+import { Public } from 'src/decorators/public.decorator';
 
 
 @ApiTags('Report(Báo cáo của doanh nghiệp)')
@@ -49,9 +50,9 @@ export class ReportController {
     }
 
 
+    @Public()
     @Post('cron/expire-reports')
     @HttpCode(200)
-        @UseGuards()
     async expirePendingReports(@Query('secret') secret: string) {
         const expectedSecret = this.configService.get<string>('CRON_SECRET');
 
