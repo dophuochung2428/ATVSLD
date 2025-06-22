@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReportPeriodController } from 'src/controllers/report-period.controller';
 import { ReportController } from 'src/controllers/report.controller';
@@ -8,13 +8,11 @@ import { Report } from 'src/entities/report.entity';
 import { User } from 'src/entities/user.entity';
 import { ExportReportService } from 'src/services/report-period/export-report.service';
 import { ReportPeriodService, ReportService } from 'src/services/report-period/report-period.service';
-import { DepartmentModule } from '../department/department.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ReportPeriod, Report, Department, User]),
-      forwardRef(() => DepartmentModule),
-  ],
+  imports: [TypeOrmModule.forFeature([ReportPeriod, Report, Department, User])
+],
   controllers: [ReportPeriodController, ReportController],
   providers: [
     { provide: 'IReportPeriodService', useClass: ReportPeriodService, },

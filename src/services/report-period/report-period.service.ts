@@ -17,6 +17,8 @@ import { createEmptyInfos } from 'src/utils/report-info.factory';
 import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
 import { User } from 'src/entities/user.entity';
 import { IDepartmentService } from '../department/department.service.interface';
+import { RegionService } from '../region/region.service';
+import { BusinessTypeLabels } from 'src/enums/business-type.labels';
 
 
 @Injectable()
@@ -274,11 +276,18 @@ export class ReportService implements IReportService {
 
         @InjectRepository(User)
         private readonly userRepo: Repository<User>,
-        @Inject('IDepartmentService')
-        private readonly departmentService: IDepartmentService,
         private readonly dataSource: DataSource,
+        private readonly regionService: RegionService,
 
     ) { }
+
+    private async getRegionNames(regionLevel1Id?: string, regionLevel2Id?: string, regionLevel3Id?: string) {
+        if (!regionLevel1Id) return { city: null, district: null, ward: null };
+        const city = await this.regionService.getLevel1Name(regionLevel1Id);
+        const district = regionLevel2Id ? await this.regionService.getLevel2Name(regionLevel1Id, regionLevel2Id) : null;
+        const ward = regionLevel2Id && regionLevel3Id ? await this.regionService.getLevel3Name(regionLevel1Id, regionLevel2Id, regionLevel3Id) : null;
+        return { city, district, ward };
+    }
 
     async getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]> {
         const reports = await this.reportRepo.find({
@@ -573,12 +582,34 @@ export class ReportService implements IReportService {
             throw new NotFoundException('Không tìm thấy báo cáo');
         }
 
-        const enrichedDepartment = await this.departmentService.findById(report.department.id) as ExtendedDepartment;
+        const dept = report.department;
+
+        const { city, district, ward } = await this.getRegionNames(
+            dept.region_level1_id,
+            dept.region_level2_id,
+            dept.region_level3_id
+        );
+
+        const { city: operationCity, district: operationDistrict, ward: operationWard } =
+            await this.getRegionNames(
+                dept.operation_region_level1_id,
+                dept.operation_region_level2_id,
+                dept.operation_region_level3_id
+            );
 
         return {
             ...report,
-            department: enrichedDepartment
-        }
+            department: {
+                ...dept,
+                business_type_label: BusinessTypeLabels[dept.business_type],
+                city,
+                district,
+                ward,
+                operationCity,
+                operationDistrict,
+                operationWard,
+            },
+        };
     }
 
 }
@@ -590,11 +621,6 @@ export type ExtendedDepartment = Department & {
     operationCity: string;
     operationDistrict: string;
     operationWard: string;
-    business_file: {
-        id: string;
-        name: string;
-        url: string;
-    }[];
     business_type_label: string;
 };
 
