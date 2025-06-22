@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateReportPeriodDto } from '@shared/dtos/report/create-report-period.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
@@ -16,6 +16,7 @@ import { CreateReportDto } from '@shared/dtos/report/create-report.dto';
 import { createEmptyInfos } from 'src/utils/report-info.factory';
 import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
 import { User } from 'src/entities/user.entity';
+import { IDepartmentService } from '../department/department.service.interface';
 
 
 @Injectable()
@@ -29,7 +30,6 @@ export class ReportPeriodService implements IReportPeriodService {
 
         @InjectRepository(Department)
         private readonly departmentRepo: Repository<Department>,
-
         private readonly dataSource: DataSource,
     ) { }
 
@@ -274,7 +274,8 @@ export class ReportService implements IReportService {
 
         @InjectRepository(User)
         private readonly userRepo: Repository<User>,
-
+        @Inject('IDepartmentService')
+        private readonly departmentService: IDepartmentService,
         private readonly dataSource: DataSource,
 
     ) { }
@@ -546,7 +547,7 @@ export class ReportService implements IReportService {
         await this.reportRepo.save(report);
     }
 
-    async findByIdWithRelations(reportId: string): Promise<Report> {
+    async findByIdWithRelations(reportId: string): Promise<ReportWithExtendedDepartment> {
         const report = await this.reportRepo.findOne({
             where: { id: reportId },
             relations: [
@@ -572,10 +573,32 @@ export class ReportService implements IReportService {
             throw new NotFoundException('Không tìm thấy báo cáo');
         }
 
-        return report;
+        const enrichedDepartment = await this.departmentService.findById(report.department.id) as ExtendedDepartment;
+
+        return {
+            ...report,
+            department: enrichedDepartment
+        }
     }
 
-    
-
 }
+
+export type ExtendedDepartment = Department & {
+    city: string;
+    district: string;
+    ward: string;
+    operationCity: string;
+    operationDistrict: string;
+    operationWard: string;
+    business_file: {
+        id: string;
+        name: string;
+        url: string;
+    }[];
+    business_type_label: string;
+};
+
+export type ReportWithExtendedDepartment = Report & {
+    department: ExtendedDepartment;
+};
 
