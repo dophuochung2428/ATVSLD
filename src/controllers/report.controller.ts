@@ -48,9 +48,10 @@ export class ReportController {
         return this.reportService.getReportsByPeriodYear(departmentId, Number(year));
     }
 
-    @UseGuards()
+
     @Post('cron/expire-reports')
     @HttpCode(200)
+        @UseGuards()
     async expirePendingReports(@Query('secret') secret: string) {
         const expectedSecret = this.configService.get<string>('CRON_SECRET');
 
