@@ -11,14 +11,12 @@ import { BusinessFile } from 'src/entities/business-file.entity';
 import { BusinessTypeLabels } from 'src/enums/business-type.labels';
 import { RegionService } from '../region/region.service';
 import { plainToInstance } from 'class-transformer';
-import { UpdateDepartmentDto } from '@shared/dtos/department/update-department.dto';
 import { PaginationQueryDto } from '@shared/dtos/pagination/pagination-query.dto';
 import * as ExcelJS from 'exceljs';
 import { Response } from 'express';
 import { BusinessType } from 'src/enums/businessType.enum';
 import { IReportPeriodService, IReportService } from '../report-period/report-period.service.interface';
 import { ReportState } from 'src/enums/report-state.enum';
-import { Report } from 'src/entities/report.entity';
 import { UpdateDepartmentWithFilesDto } from '@shared/dtos/department/update-department-with-files.dto';
 
 

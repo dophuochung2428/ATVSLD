@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Department } from '../../entities/department.entity';
 import { DepartmentService } from '../../services/department/department.service';
@@ -15,7 +15,7 @@ import { ReportPeriodModule } from '../report/report.module';
   UserModule, 
   CloudinaryModule,
   RegionModule,
-  ReportPeriodModule
+  forwardRef(() => ReportPeriodModule),
 ],
   controllers: [DepartmentController],
   providers: [

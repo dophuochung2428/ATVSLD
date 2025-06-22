@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReportPeriodController } from 'src/controllers/report-period.controller';
 import { ReportController } from 'src/controllers/report.controller';
@@ -13,7 +13,7 @@ import { DepartmentModule } from '../department/department.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ReportPeriod, Report, Department, User]),
-    DepartmentModule
+      forwardRef(() => DepartmentModule),
   ],
   controllers: [ReportPeriodController, ReportController],
   providers: [
