@@ -80,14 +80,16 @@ export class ReportPeriodService implements IReportPeriodService {
 
             // Lấy doanh nghiệp
             const departments = await queryRunner.manager.find(Department);
-
+            const now = new Date();
             // Tạo danh sách báo cáo
             const reports: Report[] = [];
             for (const dept of departments) {
+                const isExpired = savedPeriod.endDate < now;
+
                 const report = queryRunner.manager.create(Report, {
                     department: dept,
                     updateDate: null,
-                    state: ReportState.Pending,
+                    state: isExpired ? ReportState.Expired : ReportState.Pending,
                     reportPeriod: savedPeriod,
                     user: null,
                 });
