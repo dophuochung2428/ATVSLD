@@ -16,7 +16,7 @@ export interface IReportPeriodService {
   deleteMany(ids: string[]): Promise<void>
   getAllRelevantReportPeriods(): Promise<ReportPeriodResponseDto[]>
   checkYearExists(year: number): Promise<boolean>
-  getActiveYears(): Promise<number[]>
+  getActiveYears(departmentId: string): Promise<number[]>
 }
 
 

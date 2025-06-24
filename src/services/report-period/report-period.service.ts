@@ -247,12 +247,14 @@ export class ReportPeriodService implements IReportPeriodService {
         return !!found;
     }
 
-    async getActiveYears(): Promise<number[]> {
+    async getActiveYears(departmentId: string): Promise<number[]> {
         const periods = await this.repo
-            .createQueryBuilder('period')
-            .select('DISTINCT period.year', 'year')
-            .where('period.active = :active', { active: true })
-            .orderBy('period.year', 'ASC')
+            .createQueryBuilder('reportPeriod')
+            .select('DISTINCT reportPeriod.year', 'year')
+            .innerJoin('reportPeriod.reports', 'report')
+            .where('reportPeriod.active = :active', { active: true })
+            .andWhere('report.departmentId = :departmentId', { departmentId })
+            .orderBy('reportPeriod.year', 'ASC')
             .getRawMany();
 
         return periods.map(p => p.year);
