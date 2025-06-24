@@ -253,7 +253,7 @@ export class ReportPeriodService implements IReportPeriodService {
             .select('DISTINCT reportPeriod.year', 'year')
             .innerJoin('reportPeriod.reports', 'report')
             .where('reportPeriod.active = :active', { active: true })
-            .andWhere('report.departmentId = :departmentId', { departmentId })
+            .andWhere('report.department_id = :departmentId', { departmentId })
             .orderBy('reportPeriod.year', 'ASC')
             .getRawMany();
 
