@@ -217,7 +217,7 @@ export class DepartmentService implements IDepartmentService {
       const headEmail = createDto.headEmail.trim();
 
       // Gọi hàm kiểm tra hợp lệ
-      await this.checkUserCanBeHead(headEmail);
+      // await this.checkUserCanBeHead(headEmail);
 
       // Nếu không bị throw exception, thì gán
       department.headEmail = headEmail;
