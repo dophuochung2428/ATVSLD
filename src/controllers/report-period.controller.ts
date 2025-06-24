@@ -38,8 +38,7 @@ export class ReportPeriodController {
   }
 
   @Get('active-years')
-  @ApiOperation({ summary: 'Lấy danh sách các năm của kỳ báo cáo đang hoạt động' })
-  @ApiParam({ name: 'departmentId', description: 'ID doanh nghiệp' })
+  @ApiOperation({ summary: 'Lấy danh sách các năm của kỳ báo cáo đang hoạt động của doanh nghiệp' })
   async getActiveYears(@Query('departmentId', ParseUUIDPipe) departmentId: string): Promise<number[]> {
     return this.reportPeriodService.getActiveYears(departmentId);
   }
