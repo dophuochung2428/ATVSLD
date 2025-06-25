@@ -294,14 +294,18 @@ export class ReportService implements IReportService {
     }
 
     async getReportsByDepartment(departmentId: string): Promise<ReportResponseDto[]> {
-        const reports = await this.reportRepo.find({
-            where: {
-                department: { id: departmentId },
-                reportPeriod: { active: true },
-            },
-            relations: ['department', 'user', 'reportPeriod'],
-            order: { updateDate: 'DESC' },
-        });
+        const currentDate = new Date();
+
+        const reports = await this.reportRepo
+            .createQueryBuilder('report')
+            .leftJoinAndSelect('report.department', 'department')
+            .leftJoinAndSelect('report.user', 'user')
+            .leftJoinAndSelect('report.reportPeriod', 'reportPeriod')
+            .where('department.id = :departmentId', { departmentId })
+            .andWhere('reportPeriod.active = true')
+            .andWhere('reportPeriod.startDate <= :currentDate', { currentDate })
+            .orderBy('report.updateDate', 'DESC')
+            .getMany();
 
         return reports.map(report => ({
             id: report.id,
