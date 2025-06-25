@@ -37,9 +37,11 @@ export class RegionService {
     level2Id: string | null,
     level3Id: string | null,
   } {
-    const level1 = this.regions.find((l1) => l1.name === level1Name);
-    const level2 = level1?.level2s.find((l2) => l2.name === level2Name);
-    const level3 = level2?.level3s.find((l3) => l3.name === level3Name);
+    const normalize = (str: string) => str?.trim().toLowerCase();
+
+    const level1 = this.regions.find((l1) => l1.name === normalize(level1Name));
+    const level2 = level1?.level2s.find((l2) => l2.name === normalize(level2Name));
+    const level3 = level2?.level3s.find((l3) => l3.name === normalize(level3Name));
 
     return {
       level1Id: level1?.level1_id ?? null,
