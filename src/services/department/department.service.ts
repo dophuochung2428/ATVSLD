@@ -235,11 +235,11 @@ export class DepartmentService implements IDepartmentService {
       const endDate = new Date(period.endDate);
 
       // Xác nhận ngày hiện tại nằm trong khoảng startDate và endDate
-      if (currentDate >= new Date(period.startDate) && currentDate <= new Date(period.endDate)) {
+      if (currentDate <= new Date(period.endDate)) {
         await this.reportService.createReport({
           departmentId: savedDepartment.id,
           reportPeriodId: period.id,
-          state: ReportState.Expired,
+          state: ReportState.Pending,
         });
       }
     }
