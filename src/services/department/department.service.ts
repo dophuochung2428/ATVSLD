@@ -569,74 +569,100 @@ export class DepartmentService implements IDepartmentService {
     res.end();
   }
 
+  private validateEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
 
-  async importFromExcel(file: Express.Multer.File) {
+  private validatePhone(phone: string): boolean {
+    const phoneRegex = /^0\d{9}$/;
+    return phoneRegex.test(phone);
+  }
+
+  async importFromExcel(file: Express.Multer.File): Promise<{
+    createdDepartments: Department[];
+    errors: string[];
+  }> {
     if (!file) throw new BadRequestException('File is required');
 
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(file.buffer);
     const worksheet = workbook.worksheets[0];
 
-    const departments: Department[] = [];
-    const skipped: { row: number; reason: string }[] = [];
+    const createdDepartments: Department[] = [];
+    const errors: string[] = [];
 
     for (let rowNumber = 2; rowNumber <= worksheet.rowCount; rowNumber++) {
       const row = worksheet.getRow(rowNumber);
+      try {
 
-      const name = row.getCell(1).text.trim();
-      const tax_code = row.getCell(2).text.trim();
-      const business_type = row.getCell(3).text.trim() as BusinessType;
-      if (!Object.values(BusinessType).includes(business_type)) {
-        skipped.push({ row: rowNumber, reason: 'Invalid business_type' });
-        return;
+        const name = row.getCell(1).text.trim();
+        const tax_code = row.getCell(2).text.trim();
+        const business_type = row.getCell(3).text.trim() as BusinessType;
+        const industry_code = row.getCell(4).text.trim();
+        const city = row.getCell(5).text.trim();
+        const district = row.getCell(6).text.trim();
+        const ward = row.getCell(7).text.trim();
+        const address = row.getCell(8).text.trim();
+        const headName = row.getCell(9).text.trim();
+        const registration_date = row.getCell(10).text.trim();
+        const headEmail = row.getCell(11).text.trim();
+        const headPhone = row.getCell(12).text.trim();
+
+        if (!tax_code) {
+          throw new Error('Thiếu mã số thuế (tax_code)');
+        }
+
+        if (!Object.values(BusinessType).includes(business_type)) {
+          throw new Error(`Loại hình doanh nghiệp không hợp lệ: ${business_type}`);
+        }
+
+        const existed = await this.departmentRepository.findOne({ where: { tax_code } });
+        if (existed) {
+          throw new Error(`Trùng mã số thuế: ${tax_code}`);
+        }
+
+        if (headEmail && !this.validateEmail(headEmail)) {
+          throw new Error(`Email không hợp lệ: ${headEmail}`);
+        }
+
+        if (headPhone && !this.validatePhone(headPhone)) {
+          throw new Error(`Số điện thoại không hợp lệ: ${headPhone}`);
+        }
+
+        const { level1Id, level2Id, level3Id } =
+          this.regionService.getRegionIdsByNames(city, district, ward);
+
+        const department = this.departmentRepository.create({
+          name,
+          tax_code,
+          region_level1_id: level1Id,
+          region_level2_id: level2Id,
+          region_level3_id: level3Id,
+          address,
+          business_type,
+          business_industry_code: industry_code,
+          registration_date: this.parseExcelDate(registration_date),
+          headName,
+          headEmail,
+          headPhone,
+        });
+
+        createdDepartments.push(department);
+      } catch (error) {
+        errors.push(`Dòng ${rowNumber}: ${error.message || 'Lỗi không xác định'}`);
       }
 
-      const industry_code = row.getCell(4).text.trim();
-      const city = row.getCell(5).text.trim();
-      const district = row.getCell(6).text.trim();
-      const ward = row.getCell(7).text.trim();
-      const address = row.getCell(8).text.trim();
-      const headName = row.getCell(9).text.trim();
+    }
 
-      const registration_date = row.getCell(10).text.trim();
+    if (createdDepartments.length) {
+      await this.departmentRepository.save(createdDepartments);
+    }
 
-      const headEmail = row.getCell(11).text.trim();
-      const headPhone = row.getCell(12).text.trim();
-
-      if (!tax_code) {
-        skipped.push({ row: rowNumber, reason: 'Missing tax_code' });
-        return;
-      }
-
-      const existed = await this.departmentRepository.findOne({ where: { tax_code } });
-      if (existed) {
-        skipped.push({ row: rowNumber, reason: `Duplicate tax_code ${tax_code}` });
-        return;
-      }
-
-      const { level1Id, level2Id, level3Id } =
-        this.regionService.getRegionIdsByNames(city, district, ward);
-
-      const department = this.departmentRepository.create({
-        name,
-        tax_code,
-        region_level1_id: level1Id,
-        region_level2_id: level2Id,
-        region_level3_id: level3Id,
-        address,
-        business_type,
-        business_industry_code: industry_code,
-        registration_date: this.parseExcelDate(registration_date),
-        headName,
-        headEmail,
-        headPhone,
-      });
-
-      departments.push(department);
+    return {
+      createdDepartments,
+      errors,
     };
-
-    await this.departmentRepository.save(departments);
-    return { message: 'Import thành công', total: departments.length, skipped, };
   }
 
 
