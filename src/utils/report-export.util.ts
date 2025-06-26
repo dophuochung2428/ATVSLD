@@ -54,24 +54,15 @@ export function getReportExportData(
   regions: RegionsMap
 ): ExportReportData {
   const result: ExportReportData = {};
-
+  const updateDate = report.updateDate ? new Date(report.updateDate) : null;
+  result.year = updateDate?.getFullYear() ?? '____';
+  result.month = updateDate ? updateDate.getMonth() + 1 : '__';
+  result.day = updateDate?.getDate() ?? '__';
   for (const key in reportFieldMap) {
+    if (['year', 'month', 'day'].includes(key)) continue;
     const path = reportFieldMap[key as keyof ExportReportData];
 
     if (!path) continue;
-
-    if (key === 'year') {
-      result.year = report.updateDate?.getFullYear?.() ?? '____';
-      continue;
-    }
-    if (key === 'month') {
-      result.month = (report.updateDate?.getMonth?.() ?? -1) + 1 || '____';
-      continue;
-    }
-    if (key === 'day') {
-      result.day = report.updateDate?.getDate?.() ?? '__';
-      continue;
-    }
 
     const raw = getValueFromPath(report, path);
 
