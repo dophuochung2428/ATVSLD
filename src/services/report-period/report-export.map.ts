@@ -8,6 +8,9 @@ export const reportFieldMap: Partial<Record<keyof ExportReportData, string>> = {
     address: 'department.address',
     phone: 'department.phone',
     yearOfPeriod: 'reportPeriod.year',
+    year: 'year',
+    month: 'month',
+    day: 'day',
 
     // Lao động
     a1: 'laborInfos.totalWorkers',

@@ -656,8 +656,27 @@ export class DepartmentService implements IDepartmentService {
     }
 
     if (createdDepartments.length) {
-      await this.departmentRepository.save(createdDepartments);
+      const savedDepartments = await this.departmentRepository.save(createdDepartments);
+
+      const reportPeriods = await this.reportPeriodService.getAllRelevantReportPeriods();
+      const currentDate = new Date();
+
+      for (const department of savedDepartments) {
+        for (const period of reportPeriods) {
+          const startDate = new Date(period.startDate);
+          const endDate = new Date(period.endDate);
+
+          if (currentDate <= endDate) {
+            await this.reportService.createReport({
+              departmentId: department.id,
+              reportPeriodId: period.id,
+              state: ReportState.Pending,
+            });
+          }
+        }
+      }
     }
+
 
     return {
       createdDepartments,

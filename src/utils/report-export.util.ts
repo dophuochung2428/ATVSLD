@@ -60,6 +60,19 @@ export function getReportExportData(
 
     if (!path) continue;
 
+    if (key === 'year') {
+      result.year = report.updateDate?.getFullYear?.() ?? '';
+      continue;
+    }
+    if (key === 'month') {
+      result.month = (report.updateDate?.getMonth?.() ?? -1) + 1 || '';
+      continue;
+    }
+    if (key === 'day') {
+      result.day = report.updateDate?.getDate?.() ?? '';
+      continue;
+    }
+
     const raw = getValueFromPath(report, path);
 
     if (key === 'businessTypeName') {

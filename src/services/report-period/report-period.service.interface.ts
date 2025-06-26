@@ -38,6 +38,9 @@ export interface ExportReportDataBase {
   businessTypeName?: ExportFieldValue;
   address?: ExportFieldValue;
   phone?: ExportFieldValue;
+  year?: ExportFieldValue;
+  month?: ExportFieldValue;
+  day?: ExportFieldValue;
 }
 
 export type ExportReportData = ExportReportDataBase & {
