@@ -61,15 +61,15 @@ export function getReportExportData(
     if (!path) continue;
 
     if (key === 'year') {
-      result.year = report.updateDate?.getFullYear?.() ?? '';
+      result.year = report.updateDate?.getFullYear?.() ?? '____';
       continue;
     }
     if (key === 'month') {
-      result.month = (report.updateDate?.getMonth?.() ?? -1) + 1 || '';
+      result.month = (report.updateDate?.getMonth?.() ?? -1) + 1 || '____';
       continue;
     }
     if (key === 'day') {
-      result.day = report.updateDate?.getDate?.() ?? '';
+      result.day = report.updateDate?.getDate?.() ?? '__';
       continue;
     }
 

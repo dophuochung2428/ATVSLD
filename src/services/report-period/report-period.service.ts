@@ -383,7 +383,7 @@ export class ReportService implements IReportService {
 
             department: department,
             updateDate: null,
-            state: ReportState.Expired,
+            state: ReportState.Pending,
             user: null,
             reportPeriod: reportPeriod,
 
