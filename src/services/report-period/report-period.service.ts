@@ -19,6 +19,7 @@ import { User } from 'src/entities/user.entity';
 import { IDepartmentService } from '../department/department.service.interface';
 import { RegionService } from '../region/region.service';
 import { BusinessTypeLabels } from 'src/enums/business-type.labels';
+import { ReviewReportDto } from '@shared/dtos/report/review-report.dto';
 
 
 @Injectable()
@@ -458,8 +459,12 @@ export class ReportService implements IReportService {
 
             if (!report) throw new NotFoundException('Không tìm thấy báo cáo');
 
-            if ([ReportState.Completed, ReportState.Expired].includes(report.state)) {
-                throw new BadRequestException('Không thể cập nhật báo cáo đã hoàn thành hoặc đã hết hạn');
+            if ([ReportState.Completed,
+            ReportState.Expired,
+            ReportState.Approved,
+            ReportState.WaitingForApproval]
+                .includes(report.state)) {
+                throw new BadRequestException('Không thể cập nhật báo cáo đã hoàn thành, đã hết hạn, đã chấp nhận hoặc chờ chấp nhận');
             }
 
             const now = new Date();
@@ -498,7 +503,7 @@ export class ReportService implements IReportService {
             report.updateDate = new Date();
 
             if (markComplete) {
-                report.state = ReportState.Completed;
+                report.state = ReportState.WaitingForApproval;
             }
 
             const entitiesToSave = [
@@ -607,6 +612,59 @@ export class ReportService implements IReportService {
             },
         };
     }
+
+    async reviewReport(id: string, dto: ReviewReportDto) {
+        const report = await this.reportRepo.findOneBy({ id });
+
+        if (!report || report.state !== ReportState.WaitingForApproval) {
+            throw new BadRequestException('Báo cáo không hợp lệ để duyệt');
+        }
+
+        if (dto.status === 'APPROVED') {
+            report.state = ReportState.Approved;
+            report.rejectionReason = null; // Clear nếu có
+        } else if (dto.status === 'REJECTED') {
+            if (!dto.reason) {
+                throw new BadRequestException('Vui lòng nhập lý do từ chối');
+            }
+            report.state = ReportState.Rejected;
+            report.rejectionReason = dto.reason;
+        }
+
+        return this.reportRepo.save(report);
+    }
+
+     async getReportsWaitingForApproval(): Promise<ReportResponseDto[]> {
+        const currentDate = new Date();
+
+        const reports = await this.reportRepo
+            .createQueryBuilder('report')
+            .leftJoinAndSelect('report.department', 'department')
+            .leftJoinAndSelect('report.user', 'user')
+            .leftJoinAndSelect('report.reportPeriod', 'reportPeriod')
+            .where('report.state = :state', { state: ReportState.WaitingForApproval})
+            .andWhere('reportPeriod.active = true')
+            .andWhere('reportPeriod.startDate <= :currentDate', { currentDate })
+            .orderBy('report.updateDate', 'DESC')
+            .getMany();
+
+        return reports.map(report => ({
+            id: report.id,
+            year: report.reportPeriod.year,
+            state: report.state,
+            stateLabel: ReportStateLabel[report.state],
+            departmentName: report.department?.name,
+            startDate: report.reportPeriod?.startDate,
+            endDate: report.reportPeriod?.endDate,
+            period: report.reportPeriod?.period,
+            periodLabel: PeriodLabel[report.reportPeriod?.period],
+            reportPeriodName: report.reportPeriod?.name,
+            reportPeriodNameLabel: ReportNameLabel[report.reportPeriod?.name],
+            updateDate: report.updateDate,
+            userName: report.user?.fullName || null,
+        }));
+    }
+
 
 }
 

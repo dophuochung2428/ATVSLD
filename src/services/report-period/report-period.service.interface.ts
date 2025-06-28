@@ -2,6 +2,7 @@ import { CreateReportPeriodDto } from '@shared/dtos/report/create-report-period.
 import { CreateReportDto } from '@shared/dtos/report/create-report.dto';
 import { ReportPeriodResponseDto } from '@shared/dtos/report/report-period-response.dto';
 import { ReportResponseDto } from '@shared/dtos/report/report-response.dto';
+import { ReviewReportDto } from '@shared/dtos/report/review-report.dto';
 import { UpdateReportPeriodDto } from '@shared/dtos/report/update-report-period.dto';
 import { UpdateReportInfosDto } from '@shared/dtos/report/update-reportInfo.dto';
 import { ReportPeriod } from 'src/entities/report-period.entity';
@@ -28,6 +29,8 @@ export interface IReportService {
   updateReportInfos(reportId: string, dto: UpdateReportInfosDto, userId: string, markComplete?: boolean): Promise<void>
   startTyping(reportId: string, userId: string): Promise<void>
   findByIdWithRelations(reportId: string): Promise<Report>
+  reviewReport(id: string, dto: ReviewReportDto)
+  getReportsWaitingForApproval(): Promise<ReportResponseDto[]>
 }
 
 export type ExportFieldValue = string | number | undefined;

@@ -5,6 +5,7 @@ export enum ReportState {
   Expired = 'EXPIRED',
   WaitingForApproval = 'WAITING_FOR_APPROVAL',
   Approved = 'APPROVED',
+  Rejected = 'REJECTED',
 }
 
 export const ReportStateLabel = {
@@ -14,4 +15,5 @@ export const ReportStateLabel = {
   [ReportState.Expired]: 'Hết hạn',
   [ReportState.WaitingForApproval]: 'Chờ duyệt',
   [ReportState.Approved]: 'Đã duyệt',
+  [ReportState.Rejected]: 'Không chấp nhận',
 };

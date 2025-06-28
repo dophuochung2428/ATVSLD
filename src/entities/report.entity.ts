@@ -48,6 +48,10 @@ export class Report {
     @JoinColumn({ name: 'report_period_id' })
     reportPeriod: ReportPeriod;
 
+    @Column({ type: 'text', nullable: true })
+    rejectionReason?: string;
+
+
 
     /////////////////////////////////////////////////////////////////////
     @OneToOne(() => AccidentInfo, (accidentInfos) => accidentInfos.report, { cascade: true, })

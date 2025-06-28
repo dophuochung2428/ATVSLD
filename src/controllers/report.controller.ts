@@ -14,6 +14,7 @@ import { StreamableFile } from '@nestjs/common';
 import { ExportReportDynamicFieldsDto } from '@shared/dtos/report/ExportReportDynamicFields.dto';
 import { ConfigService } from '@nestjs/config';
 import { Public } from 'src/decorators/public.decorator';
+import { ReviewReportDto } from '@shared/dtos/report/review-report.dto';
 
 
 @ApiTags('Report(Báo cáo của doanh nghiệp)')
@@ -204,5 +205,22 @@ export class ReportController {
     async getReportDetail(@Param('id', ParseUUIDPipe) id: string) {
         return this.reportService.findByIdWithRelations(id);
     }
+
+    @Patch(':id/review')
+    @ApiOperation({ summary: 'Duyệt/ Từ chối báo cáo' })
+    reviewReport(
+        @Param('id') id: string,
+        @Body() dto: ReviewReportDto,
+    ) {
+        return this.reportService.reviewReport(id, dto);
+    }
+
+    @Permissions('USER_C_REPORT_VIEW')
+    @Get('pending-approval')
+    @ApiOperation({ summary: 'Lấy thông tin báo cáo chờ duyệt' })
+    async getByReportState(): Promise<ReportResponseDto[]> {
+        return this.reportService.getReportsWaitingForApproval();
+    }
+
 
 }
