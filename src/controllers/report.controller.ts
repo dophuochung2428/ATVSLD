@@ -198,6 +198,13 @@ export class ReportController {
         }
     }
 
+    @Permissions('ADMIN_C_REPORT_REVIEW')
+    @Get('pending-approval')
+    @ApiOperation({ summary: 'Lấy thông tin báo cáo chờ duyệt' })
+    async getByReportState(): Promise<ReportResponseDto[]> {
+        return this.reportService.getReportsWaitingForApproval();
+    }
+
     @Permissions('USER_C_REPORT_VIEW')
     @Get(':id')
     @ApiParam({ name: 'id', description: 'ID của báo cáo' })
@@ -206,21 +213,17 @@ export class ReportController {
         return this.reportService.findByIdWithRelations(id);
     }
 
+    @Permissions('ADMIN_C_REPORT_REVIEW')
     @Patch(':id/review')
     @ApiOperation({ summary: 'Duyệt/ Từ chối báo cáo' })
     reviewReport(
-        @Param('id') id: string,
+        @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: ReviewReportDto,
     ) {
         return this.reportService.reviewReport(id, dto);
     }
 
-    @Permissions('USER_C_REPORT_VIEW')
-    @Get('pending-approval')
-    @ApiOperation({ summary: 'Lấy thông tin báo cáo chờ duyệt' })
-    async getByReportState(): Promise<ReportResponseDto[]> {
-        return this.reportService.getReportsWaitingForApproval();
-    }
+
 
 
 }
